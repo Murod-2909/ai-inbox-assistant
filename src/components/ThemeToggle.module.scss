@@ -1,0 +1,17 @@
+@use "@/styles/variables" as *;
+
+.toggle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+  background: $color-surface;
+  font-size: 15px;
+  transition: background 0.15s;
+
+  &:hover {
+    background: $color-bg;
+  }
+}

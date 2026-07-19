@@ -1,0 +1,108 @@
+// Rang tokenlari — light/dark rejim CSS custom property'lar orqali.
+// SCSS o'zgaruvchilari ($color-*) shu var()'larga ishora qiladi — src/styles/_variables.scss
+@mixin light-tokens {
+  --color-bg: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-border: #e4e7ec;
+  --color-text: #101828;
+  --color-text-muted: #667085;
+  --color-primary: #4f46e5;
+  --color-primary-soft: #eef2ff;
+  --color-success: #12b76a;
+  --color-success-soft: #ecfdf3;
+  --color-success-strong: #027a48;
+  --color-warning: #f79009;
+  --color-warning-soft: #fffaeb;
+  --color-warning-strong: #b54708;
+  --color-danger: #f04438;
+  --color-danger-soft: #fef3f2;
+  --color-danger-strong: #b42318;
+  // Grafik ranglari — dataviz validatoridan o'tgan (light surface)
+  --chart-positive: #12b76a;
+  --chart-neutral: #f79009;
+  --chart-negative: #f04438;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+}
+
+@mixin dark-tokens {
+  --color-bg: #0f1115;
+  --color-surface: #171a20;
+  --color-border: #262b33;
+  --color-text: #e6e8ec;
+  --color-text-muted: #9aa1ad;
+  --color-primary: #818cf8;
+  --color-primary-soft: rgba(99, 102, 241, 0.16);
+  --color-success: #32d583;
+  --color-success-soft: rgba(18, 183, 106, 0.14);
+  --color-success-strong: #6ce9a6;
+  --color-warning: #fdb022;
+  --color-warning-soft: rgba(247, 144, 9, 0.14);
+  --color-warning-strong: #fec84b;
+  --color-danger: #f97066;
+  --color-danger-soft: rgba(240, 68, 56, 0.14);
+  --color-danger-strong: #fda29b;
+  // Grafik ranglari — dataviz validatoridan o'tgan (dark surface)
+  --chart-positive: #0da35e;
+  --chart-neutral: #c97207;
+  --chart-negative: #f04438;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+:root {
+  @include light-tokens;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  @include dark-tokens;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    @include dark-tokens;
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s, color 0.2s;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}

@@ -1,0 +1,145 @@
+@use "@/styles/variables" as *;
+
+.page {
+  max-width: 960px;
+}
+
+.header {
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: 14px;
+    color: $color-text-muted;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+
+  &.disabled {
+    opacity: 0.65;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+
+  h3 {
+    font-size: 15px;
+  }
+}
+
+.channelIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: $radius-md;
+  font-size: 20px;
+
+  &.telegram {
+    background: rgba(34, 158, 217, 0.12);
+  }
+
+  &.whatsapp {
+    background: rgba(37, 211, 102, 0.12);
+  }
+
+  &.instagram {
+    background: rgba(225, 48, 108, 0.12);
+  }
+}
+
+.status {
+  font-size: 12px;
+  color: $color-text-muted;
+
+  &.statusOn {
+    color: $color-success;
+    font-weight: 600;
+  }
+}
+
+.steps {
+  font-size: 13px;
+  color: $color-text-muted;
+  padding-left: 18px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  code {
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 12px;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  input {
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 9px 12px;
+    font-size: 13px;
+    outline: none;
+
+    &:focus {
+      border-color: $color-telegram;
+    }
+  }
+
+  button {
+    background: $color-telegram;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px;
+    border-radius: $radius-md;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.connectedBox {
+  font-size: 13px;
+  line-height: 1.5;
+  background: $color-success-soft;
+  border: 1px solid rgba(18, 183, 106, 0.3);
+  border-radius: $radius-md;
+  padding: 12px 14px;
+}
+
+.soon {
+  font-size: 13px;
+  color: $color-text-muted;
+  line-height: 1.5;
+}

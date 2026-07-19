@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Inbox Assistant
 
-## Getting Started
+Kichik bizneslar (do'kon, klinika, salon, o'quv markazi) uchun mijozlar xabarlarini bitta dashboard'ga yig'ib, AI yordamida tahlil qiladigan (sentiment, intent) va javob taklif qiladigan tizim.
 
-First, run the development server:
+## Stack
+
+- **Frontend:** Next.js (App Router) + TypeScript + SCSS modullar
+- **Backend:** FastAPI (Python) — keyingi bosqichda
+- **Database / Realtime:** Supabase (Postgres + Realtime + RLS)
+- **AI:** OpenAI yoki Claude API — xabar tahlili va javob generatsiyasi
+
+## Dizayn tamoyillari
+
+- **Toza va intuitiv UI** — operator uchun tezkor ish oqimi, ortiqcha element yo'q
+- **Real-time silliqlik** — yangi xabar animatsiya bilan keladi (hozircha simulyatsiya, keyin Supabase Realtime)
+- **Responsive** — mobil ekranda sidebar pastki navigatsiyaga, inbox bitta panelga aylanadi
+- **Light/dark rejim** — tizim sozlamasiga ergashadi, qo'lda ham almashtiriladi (sidebar pastida)
+- **AI token tejash** — strategiya [docs/ai-strategy.md](docs/ai-strategy.md) da: keshlash, arzon model bilan oldindan filtrlash, qisqa promptlar
+
+To'liq talablar ro'yxati va joriy holat: [docs/requirements.md](docs/requirements.md)
+
+## Bosqichlar (roadmap)
+
+1. ✅ **Frontend skeleton** — dashboard layout, inbox UI, Telegram ulanish UI, dark mode, responsive, tahlil sahifasi
+2. ✅ **Backend (FastAPI)** — Telegram webhook, SQLite baza, REST API ([backend/README.md](backend/README.md))
+3. ✅ **AI tahlil** — 3 pog'onali: kesh → AI'siz filtr → Claude (Haiku klassifikatsiya + Opus javob); kalitsiz heuristika bilan ishlaydi
+4. ✅ **Media** — rasm/video/ovoz/stiker inbox'da ko'rinadi; media proxy (token maxfiy qoladi); STT arxitekturasi tayyor; yangi xabarda ovozli signal
+5. ⏳ **Supabase** — sxema va RLS tayyor ([backend/supabase/schema.sql](backend/supabase/schema.sql)), hisob ochilgach ulanadi; Realtime polling o'rnini oladi
+6. ⏳ **Auth** (Supabase Auth), **operator qulayliklari**, **WhatsApp / Instagram**
+
+## Ishga tushirish
 
 ```bash
+# 1. Backend (birinchi terminal)
+cd backend
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+
+# 2. Frontend (ikkinchi terminal)
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Brauzerda [http://localhost:3000](http://localhost:3000) oching — avtomatik `/inbox` ga yo'naltiradi.
+Backend ishlamasa, frontend avtomatik **demo rejimga** o'tadi (namunaviy ma'lumotlar bilan).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Struktura
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+  app/
+    (dashboard)/       # sidebar'li umumiy layout
+      inbox/           # xabarlar (asosiy sahifa)
+      channels/        # Telegram/WhatsApp/Instagram ulanish
+      analytics/       # tahlil (placeholder)
+      settings/        # sozlamalar (placeholder)
+  components/          # UI komponentlar (SCSS modullar bilan)
+  lib/                 # turlar va mock ma'lumotlar
+  styles/              # SCSS o'zgaruvchilar (design tokens)
+```
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Hozircha barcha ma'lumotlar `src/lib/mock-data.ts` dan keladi — backend tayyor bo'lgach real API'ga almashtiriladi.

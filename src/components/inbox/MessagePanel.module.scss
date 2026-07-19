@@ -1,0 +1,435 @@
+@use "@/styles/variables" as *;
+
+.panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid $color-border;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.backButton {
+  display: none;
+  font-size: 18px;
+  color: $color-text-muted;
+  padding: 4px 8px;
+  border-radius: $radius-sm;
+
+  &:hover {
+    background: $color-bg;
+  }
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+  font-size: 12px;
+  color: $color-text-muted;
+}
+
+.channel {
+  color: $color-telegram;
+  font-weight: 600;
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: $radius-sm;
+  border: 1px solid $color-border;
+  background: $color-surface;
+  font-size: 15px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+
+  &:hover {
+    background: $color-bg;
+  }
+}
+
+.iconButtonActive {
+  background: $color-primary-soft;
+  border-color: $color-primary;
+}
+
+// --- Ichki eslatmalar paneli ---
+
+.notesPanel {
+  border-bottom: 1px solid $color-border;
+  background: $color-warning-soft;
+  padding: 12px 20px;
+}
+
+.notesTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-warning-strong;
+  margin-bottom: 8px;
+}
+
+.notesEmpty {
+  font-size: 13px;
+  color: $color-text-muted;
+}
+
+.notesList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+
+  li {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+}
+
+.noteTime {
+  font-size: 11px;
+  color: $color-text-muted;
+  margin-left: 8px;
+}
+
+.noteForm {
+  display: flex;
+  gap: 8px;
+
+  input {
+    flex: 1;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    padding: 7px 10px;
+    font-size: 13px;
+    background: $color-surface;
+    outline: none;
+
+    &:focus {
+      border-color: $color-primary;
+    }
+  }
+
+  button {
+    font-size: 13px;
+    font-weight: 600;
+    color: $color-primary;
+    border: 1px solid $color-primary;
+    border-radius: $radius-sm;
+    padding: 7px 14px;
+    background: $color-surface;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// --- Shablonlar ro'yxati ---
+
+.templateList {
+  margin: 0 20px;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  background: $color-surface;
+  box-shadow: $shadow-md;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.templateItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid $color-border;
+  transition: background 0.15s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: $color-primary-soft;
+  }
+
+  strong {
+    font-size: 13px;
+  }
+
+  span {
+    font-size: 12px;
+    color: $color-text-muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: $color-bg;
+  border: 1px solid $color-border;
+}
+
+.badgePositive {
+  background: $color-success-soft;
+  border-color: transparent;
+  color: $color-success-strong;
+}
+
+.badgeNeutral {
+  background: $color-warning-soft;
+  border-color: transparent;
+  color: $color-warning-strong;
+}
+
+.badgeNegative {
+  background: $color-danger-soft;
+  border-color: transparent;
+  color: $color-danger-strong;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: $color-bg;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: $radius-lg;
+  font-size: 14px;
+  line-height: 1.45;
+  box-shadow: $shadow-sm;
+  animation: message-in 0.25s ease-out;
+
+  p {
+    margin-bottom: 4px;
+  }
+}
+
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// --- Media turlari ---
+
+.mediaImage {
+  display: block;
+  max-width: 100%;
+  max-height: 280px;
+  border-radius: $radius-md;
+  margin-bottom: 6px;
+}
+
+.mediaVideo {
+  display: block;
+  max-width: 100%;
+  max-height: 280px;
+  border-radius: $radius-md;
+  margin-bottom: 6px;
+}
+
+.mediaAudio {
+  display: block;
+  width: 240px;
+  max-width: 100%;
+  margin-bottom: 6px;
+}
+
+.transcript {
+  font-size: 13px;
+  color: $color-text-muted;
+  border-left: 2px solid $color-border;
+  padding-left: 8px;
+  margin-top: 4px;
+}
+
+// Stiker: pufakcha fonisiz, katta emoji
+.stickerBubble {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 4px;
+}
+
+.sticker {
+  font-size: 56px;
+  line-height: 1.1;
+}
+
+.incoming {
+  align-self: flex-start;
+  background: $color-surface;
+  border-bottom-left-radius: $radius-sm;
+}
+
+.outgoing {
+  align-self: flex-end;
+  background: $color-primary;
+  color: #fff;
+  border-bottom-right-radius: $radius-sm;
+
+  .time {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.time {
+  font-size: 11px;
+  color: $color-text-muted;
+}
+
+.suggestion {
+  margin: 0 20px;
+  padding: 12px 14px;
+  border: 1px dashed $color-primary;
+  border-radius: $radius-md;
+  background: $color-primary-soft;
+}
+
+.suggestionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-primary;
+  margin-bottom: 6px;
+}
+
+.useButton {
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-primary;
+  background: $color-surface;
+  border: 1px solid $color-primary;
+  border-radius: $radius-sm;
+  padding: 4px 12px;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: $color-primary;
+    color: #fff;
+  }
+}
+
+.suggestionText {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.composer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px;
+
+  textarea {
+    flex: 1;
+    resize: none;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+
+    &:focus {
+      border-color: $color-primary;
+    }
+  }
+}
+
+.sendButton {
+  align-self: flex-end;
+  background: $color-primary;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: $radius-md;
+  transition: opacity 0.15s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Mobil moslashuvlar
+@media (max-width: $breakpoint-mobile) {
+  .backButton {
+    display: block;
+  }
+
+  .header {
+    padding: 10px 12px;
+    flex-wrap: wrap;
+  }
+
+  .messages {
+    padding: 12px;
+  }
+
+  .bubble {
+    max-width: 85%;
+  }
+
+  .suggestion {
+    margin: 0 12px;
+  }
+
+  .composer {
+    padding: 10px 12px;
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ai-inbox-assistant",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "/Users/admin/Desktop/ai-inbox-assistant",
+      "port": 3000
+    }
+  ]
+}

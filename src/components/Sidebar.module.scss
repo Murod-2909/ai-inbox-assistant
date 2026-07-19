@@ -1,0 +1,148 @@
+@use "@/styles/variables" as *;
+
+.sidebar {
+  width: $sidebar-width;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: $color-surface;
+  border-right: 1px solid $color-border;
+  padding: 20px 12px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 0 8px 20px;
+}
+
+.logoMark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-sm;
+  background: $color-primary;
+  color: #fff;
+  font-size: 13px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: $radius-md;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text-muted;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: $color-bg;
+    color: $color-text;
+  }
+
+  &.active {
+    background: $color-primary-soft;
+    color: $color-primary;
+  }
+}
+
+.icon {
+  font-size: 16px;
+}
+
+.footer {
+  border-top: 1px solid $color-border;
+  padding-top: 16px;
+}
+
+.business {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+}
+
+.businessInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: $color-primary-soft;
+  color: $color-primary;
+  font-weight: 600;
+}
+
+.businessName {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.businessPlan {
+  font-size: 12px;
+  color: $color-text-muted;
+}
+
+// Mobil: sidebar pastki navigatsiya panelga aylanadi
+@media (max-width: $breakpoint-mobile) {
+  .sidebar {
+    width: 100%;
+    height: $mobile-nav-height;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 8px;
+    border-right: none;
+    border-top: 1px solid $color-border;
+  }
+
+  .logo {
+    display: none;
+  }
+
+  .nav {
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 0;
+  }
+
+  .navItem {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+
+  .footer {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .business {
+    padding: 0;
+  }
+
+  .avatar,
+  .businessInfo {
+    display: none;
+  }
+}

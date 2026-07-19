@@ -1,0 +1,25 @@
+@use "@/styles/variables" as *;
+
+.shell {
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+// Mobil: navigatsiya pastda, kontent tepada
+@media (max-width: $breakpoint-mobile) {
+  .shell {
+    flex-direction: column-reverse;
+  }
+
+  .content {
+    padding: 12px;
+  }
+}

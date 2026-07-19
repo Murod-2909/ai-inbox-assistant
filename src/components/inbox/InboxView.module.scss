@@ -1,0 +1,76 @@
+@use "@/styles/variables" as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: calc(100dvh - 48px);
+}
+
+.demoBanner {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: $color-warning-strong;
+  background: $color-warning-soft;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 8px 14px;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  height: 40vh;
+  color: $color-text-muted;
+  font-size: 14px;
+}
+
+.inbox {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+}
+
+.listPane {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  min-height: 0;
+  border-right: 1px solid $color-border;
+}
+
+.panelPane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  min-height: 0;
+}
+
+.empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  color: $color-text-muted;
+  font-size: 14px;
+}
+
+// Mobil: bir vaqtda faqat bitta panel ko'rinadi
+@media (max-width: $breakpoint-mobile) {
+  .wrapper {
+    height: calc(100dvh - #{$mobile-nav-height} - 24px);
+  }
+
+  .listPane {
+    width: 100%;
+    border-right: none;
+  }
+
+  .hideOnMobile {
+    display: none;
+  }
+}

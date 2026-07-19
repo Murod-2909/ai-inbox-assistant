@@ -1,0 +1,171 @@
+@use "@/styles/variables" as *;
+
+.list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-bottom: 1px solid $color-border;
+
+  h2 {
+    font-size: 16px;
+  }
+}
+
+.count {
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-primary;
+  background: $color-primary-soft;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.items {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.item {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid $color-border;
+  transition: background 0.15s;
+
+  &:hover {
+    background: $color-bg;
+  }
+
+  &.selected {
+    background: $color-primary-soft;
+  }
+
+  // Yangi xabar kelganda qisqa yorqinlik effekti
+  &.flash {
+    animation: flash-bg 1.4s ease-out;
+  }
+}
+
+@keyframes flash-bg {
+  0% {
+    background: $color-primary-soft;
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.avatar {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: $color-bg;
+  border: 1px solid $color-border;
+  font-weight: 600;
+  color: $color-text-muted;
+}
+
+.dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid $color-surface;
+}
+
+.dotPositive {
+  background: $color-success;
+}
+
+.dotNeutral {
+  background: $color-warning;
+}
+
+.dotNegative {
+  background: $color-danger;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.time {
+  font-size: 12px;
+  color: $color-text-muted;
+  flex-shrink: 0;
+}
+
+.bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.preview {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: $color-text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.unread {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: $color-primary;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  animation: pop-in 0.3s ease-out;
+}
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
