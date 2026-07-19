@@ -1,0 +1,269 @@
+@use "@/styles/variables" as *;
+
+.shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 24px;
+  background: $color-bg;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.logoMark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: $radius-sm;
+  background: $color-primary;
+  color: #fff;
+  font-size: 12px;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  padding: 28px;
+}
+
+.demoNote {
+  font-size: 12px;
+  color: $color-text-muted;
+}
+
+// --- Karta ichi (sahifalar ishlatadi) ---
+
+.title {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: $color-text-muted;
+  margin-bottom: 20px;
+}
+
+.googleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 11px;
+  transition: background 0.15s;
+
+  &:hover {
+    background: $color-bg;
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: $color-text-muted;
+  margin: 18px 0;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: $color-border;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  input {
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    background: $color-bg;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+
+    &:focus {
+      border-color: $color-primary;
+    }
+  }
+}
+
+.fieldError {
+  input {
+    border-color: $color-danger;
+  }
+}
+
+.fieldHint {
+  font-size: 12px;
+  color: $color-danger;
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  a {
+    font-size: 12px;
+    font-weight: 500;
+    color: $color-primary;
+  }
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: $color-text-muted;
+  margin-bottom: 16px;
+
+  input {
+    accent-color: var(--color-primary);
+  }
+}
+
+// Xatolik banneri (crisp/respond uslubi: forma tepasida qizil blok)
+.errorBanner {
+  font-size: 13px;
+  color: $color-danger-strong;
+  background: $color-danger-soft;
+  border: 1px solid $color-danger;
+  border-radius: $radius-md;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.submitButton {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: $color-primary;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: $radius-md;
+  padding: 12px;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.switchLine {
+  text-align: center;
+  font-size: 13px;
+  color: $color-text-muted;
+  margin-top: 18px;
+
+  a {
+    color: $color-primary;
+    font-weight: 600;
+  }
+}
+
+// --- Muvaffaqiyat / tasdiqlash ekranlari ---
+
+.successState {
+  text-align: center;
+  padding: 8px 0;
+
+  h2 {
+    font-size: 18px;
+    margin: 12px 0 8px;
+  }
+
+  p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: $color-text-muted;
+    margin-bottom: 20px;
+  }
+}
+
+.successIcon {
+  font-size: 40px;
+}
+
+// --- Onboarding (biznes ma'lumotlari) ---
+
+.categoryChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.chip {
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid $color-border;
+  border-radius: 999px;
+  padding: 8px 14px;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: $color-primary;
+  }
+}
+
+.chipActive {
+  background: $color-primary-soft;
+  border-color: $color-primary;
+  color: $color-primary;
+}
+
+.stepIndicator {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+
+  span {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: $color-border;
+  }
+
+  .stepDone {
+    background: $color-primary;
+  }
+}

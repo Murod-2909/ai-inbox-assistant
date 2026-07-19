@@ -22,9 +22,9 @@ Holat belgilari: ✅ tayyor · 🔶 qisman · ⏳ rejada
 
 ## 3. Login / Logout (Autentifikatsiya)
 
-- ⏳ Email + parol, Google OAuth (Supabase Auth orqali — Supabase ulangach)
-- ⏳ Parol tiklash, sign up oqimi
-- ⏳ Logout, "meni eslab qol", token muddati
+- 🔶 Email + parol, Google OAuth — UI tayyor (login/signup sahifalari, Google tugmasi), Supabase Auth ulangach faollashadi
+- 🔶 Parol tiklash va sign up oqimi — UI tayyor (email tasdiqlash ekrani + onboarding qadami bilan)
+- 🔶 "Meni eslab qol" — UI'da bor; logout va token muddati Supabase bilan
 - ⏳ Ko'p qurilma sessiyalari va masofadan chiqarish
 
 ## 4. AI qo'shimchalar
@@ -64,6 +64,7 @@ Holat belgilari: ✅ tayyor · 🔶 qisman · ⏳ rejada
 
 ## 9. Umumiy
 
+- ✅ Landing sahifa (hero, kanallar, xususiyatlar, narxlar, FAQ, footer) — SaaS namunalari strukturasi asosida
 - ✅ Zamonaviy responsive dizayn
 - ✅ AI token optimallashtirish (kesh, AI'siz filtr, qisqa promptlar, 2 pog'onali model) — `docs/ai-strategy.md`
 
