@@ -290,7 +290,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Link
-                href="/signup"
+                href={plan.name === "Bepul" ? "/inbox" : "/checkout"}
                 className={
                   plan.highlighted
                     ? styles.primaryButton

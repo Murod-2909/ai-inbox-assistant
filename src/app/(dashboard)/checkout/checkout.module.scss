@@ -1,0 +1,201 @@
+@use "@/styles/variables" as *;
+
+.checkoutPage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.planSelector {
+  text-align: center;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: $color-text;
+  }
+
+  > p {
+    font-size: 16px;
+    color: $color-text-muted;
+    margin-bottom: 40px;
+  }
+}
+
+.planGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.planCard {
+  background: $color-surface;
+  border: 2px solid $color-border;
+  border-radius: $radius-lg;
+  padding: 32px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: $color-primary;
+    box-shadow: 0 8px 16px rgba(79, 70, 229, 0.1);
+  }
+
+  &.selected {
+    border-color: $color-primary;
+    background: $color-primary-soft;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: $color-text;
+  }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 8px;
+
+    .amount {
+      font-size: 36px;
+      font-weight: 700;
+      color: $color-primary;
+    }
+
+    .period {
+      font-size: 14px;
+      color: $color-text-muted;
+    }
+  }
+
+  .description {
+    font-size: 14px;
+    color: $color-text-muted;
+    margin-bottom: 24px;
+  }
+
+  .features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    text-align: left;
+
+    li {
+      font-size: 14px;
+      padding: 8px 0;
+      color: $color-text;
+
+      &::before {
+        content: "✓ ";
+        color: $color-success;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .selectButton {
+    width: 100%;
+    padding: 12px 20px;
+    background: $color-primary;
+    color: #fff;
+    border: none;
+    border-radius: $radius-md;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: var(--color-primary-hover, darken($color-primary, 10%));
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+.checkoutContainer {
+  max-width: 600px;
+  margin: 0 auto;
+
+  .backButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: $color-text-muted;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $color-text;
+    }
+  }
+
+  .checkoutInfo {
+    background: $color-surface;
+    border-radius: $radius-lg;
+    padding: 24px;
+    margin-bottom: 24px;
+    text-align: center;
+    border: 1px solid $color-border;
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: $color-text;
+    }
+
+    .amount {
+      font-size: 20px;
+      font-weight: 700;
+      color: $color-primary;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .checkoutPage {
+    padding: 20px 16px;
+  }
+
+  .planSelector {
+    h1 {
+      font-size: 24px;
+    }
+  }
+
+  .planGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .planCard {
+    padding: 20px 16px;
+
+    h2 {
+      font-size: 18px;
+    }
+
+    .price .amount {
+      font-size: 28px;
+    }
+  }
+}

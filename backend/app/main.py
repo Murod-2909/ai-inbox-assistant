@@ -17,9 +17,14 @@ from fastapi import FastAPI, HTTPException  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import Response  # noqa: E402
 
+import stripe  # noqa: E402
+
 from app import ai, telegram  # noqa: E402
 from app.store import SUPABASE_ENABLED, db as database  # noqa: E402
 from app.schemas import NoteRequest, ReplyRequest, TemplateRequest  # noqa: E402
+
+# Stripe setup
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 app = FastAPI(title="AI Inbox Assistant API", version="0.1.0")
 
@@ -208,6 +213,60 @@ def create_note(conversation_id: str, body: NoteRequest) -> dict:
 @app.get("/api/stats")
 def get_stats() -> dict:
     return database.get_stats()
+
+
+# ---------- To'lov (Stripe) ----------
+
+PRICING = {
+    "start": {
+        "name": "Start Tarifi",
+        "price": 14900000,  # UZS tiyinlarda (149,000 so'm)
+        "description": "O'sib borayotgan bizneslar uchun",
+    },
+    "business": {
+        "name": "Biznes Tarifi",
+        "price": 34900000,  # UZS tiyinlarda (349,000 so'm)
+        "description": "Katta jamoa uchun",
+    },
+}
+
+
+@app.post("/api/checkout")
+async def create_checkout(body: dict) -> dict:
+    """Stripe checkout session yaratadi (Embedded Checkout uchun)."""
+    plan = body.get("plan")
+    if plan not in PRICING:
+        raise HTTPException(status_code=400, detail="Noto'g'ri tarif")
+
+    if not stripe.api_key:
+        raise HTTPException(
+            status_code=500, detail="Stripe'ni configurelamagan (STRIPE_SECRET_KEY yo'q)"
+        )
+
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "uzs",
+                        "product_data": {
+                            "name": PRICING[plan]["name"],
+                            "description": PRICING[plan]["description"],
+                        },
+                        "unit_amount": PRICING[plan]["price"],
+                        "recurring": {"interval": "month", "interval_count": 1},
+                    },
+                    "quantity": 1,
+                }
+            ],
+            mode="subscription",
+            ui_mode="embedded",
+            return_url=f"{os.getenv('API_URL', 'http://localhost:3000')}/success",
+        )
+        return {"clientSecret": session.client_secret}
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=500, detail=f"Stripe xatosi: {str(e)}")
 
 
 # ---------- Telegram webhook ----------

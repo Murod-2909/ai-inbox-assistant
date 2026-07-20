@@ -1,0 +1,176 @@
+@use "@/styles/variables" as *;
+
+.successPage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, var(--color-bg) 0%, $color-primary-soft 100%);
+}
+
+.container {
+  background: $color-surface;
+  border-radius: $radius-lg;
+  padding: 60px 40px;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: $color-success-soft;
+  border-radius: 50%;
+  font-size: 40px;
+  color: $color-success;
+  margin-bottom: 24px;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: $color-text;
+}
+
+> p {
+  font-size: 16px;
+  color: $color-text-muted;
+  margin-bottom: 40px;
+}
+
+.details {
+  text-align: left;
+  background: var(--color-bg);
+  border-radius: $radius-md;
+  padding: 32px;
+  margin-bottom: 40px;
+}
+
+.step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .stepNumber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: $color-primary;
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 4px;
+    color: $color-text;
+  }
+
+  p {
+    font-size: 14px;
+    color: $color-text-muted;
+    margin: 0;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  .primaryButton,
+  .secondaryButton {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: $radius-md;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .primaryButton {
+    background: $color-primary;
+    color: #fff;
+
+    &:hover {
+      background: var(--color-primary-hover, lighten($color-primary, 5%));
+      transform: translateY(-2px);
+    }
+  }
+
+  .secondaryButton {
+    background: $color-border;
+    color: $color-text;
+
+    &:hover {
+      background: $color-bg;
+    }
+  }
+}
+
+.support {
+  font-size: 14px;
+  color: $color-text-muted;
+
+  a {
+    color: $color-primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .container {
+    padding: 40px 24px;
+  }
+
+  .icon {
+    width: 60px;
+    height: 60px;
+    font-size: 32px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .details {
+    padding: 20px 16px;
+  }
+
+  .step {
+    gap: 12px;
+
+    .stepNumber {
+      width: 36px;
+      height: 36px;
+      font-size: 14px;
+    }
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}
