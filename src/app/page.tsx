@@ -1,7 +1,15 @@
 // Landing (bosh) sahifa — struktura chatterapp.io / crisp.chat kabi
 // SaaS landinglardan o'rganilgan: hero → kanallar → xususiyatlar →
 // qadamlar → narxlar → FAQ → CTA → footer. Dizayn — o'zimizniki.
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
+import { FloatingElement } from "@/components/animations/FloatingElement";
+import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
+import { GradientBg } from "@/components/animations/GradientBg";
+import { HeroScene } from "@/components/3d/HeroScene";
 import styles from "./landing.module.scss";
 
 const FEATURES = [
@@ -116,6 +124,7 @@ const FAQ = [
 export default function LandingPage() {
   return (
     <div className={styles.landing}>
+      <GradientBg />
       {/* --- Navigatsiya --- */}
       <nav className={styles.nav}>
         <div className={styles.logo}>
@@ -140,31 +149,64 @@ export default function LandingPage() {
       {/* --- Hero --- */}
       <header className={styles.hero}>
         <div className={styles.heroText}>
-          <h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             Barcha mijoz xabarlari.
             <br />
             <span className={styles.accent}>Bitta joyda. AI bilan.</span>
-          </h1>
-          <p>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             Do&apos;kon, klinika, salon yoki o&apos;quv markazi uchun: Telegram
             xabarlarini yagona inbox&apos;ga yig&apos;ing, AI tahlili va tayyor
             javob takliflari bilan mijozlarga 3 barobar tez javob bering.
-          </p>
-          <div className={styles.heroCtas}>
-            <Link href="/signup" className={styles.primaryButtonLarge}>
-              Bepul boshlash
-            </Link>
-            <Link href="/inbox" className={styles.ghostButtonLarge}>
-              Jonli demo ko&apos;rish
-            </Link>
-          </div>
-          <span className={styles.heroNote}>
+          </motion.p>
+          <motion.div
+            className={styles.heroCtas}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="/signup" className={styles.primaryButtonLarge}>
+                Bepul boshlash
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="/inbox" className={styles.ghostButtonLarge}>
+                Jonli demo ko&apos;rish
+              </Link>
+            </motion.div>
+          </motion.div>
+          <motion.span
+            className={styles.heroNote}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
             Karta talab qilinmaydi · 5 daqiqada ulanish
-          </span>
+          </motion.span>
         </div>
 
+        {/* 3D Hero Scene */}
+        <FloatingElement delay={0.5} distance={30}>
+          <HeroScene />
+        </FloatingElement>
+
         {/* Mini dashboard ko'rinishi (CSS bilan chizilgan) */}
-        <div className={styles.heroPreview} aria-hidden="true">
+        <motion.div
+          className={styles.heroPreview}
+          aria-hidden="true"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
           <div className={styles.previewList}>
             <div className={styles.previewRow}>
               <span className={`${styles.previewDot} ${styles.dotGreen}`} />
@@ -201,7 +243,7 @@ export default function LandingPage() {
               yuboring, hoziroq tekshiramiz.&quot;
             </div>
           </div>
-        </div>
+        </motion.div>
       </header>
 
       {/* --- Kimlar uchun --- */}
@@ -239,44 +281,72 @@ export default function LandingPage() {
 
       {/* --- Xususiyatlar --- */}
       <section id="features" className={styles.features}>
-        <h2>Kichik jamoa uchun katta imkoniyatlar</h2>
+        <ScrollReveal>
+          <h2>Kichik jamoa uchun katta imkoniyatlar</h2>
+        </ScrollReveal>
         <div className={styles.featureGrid}>
-          {FEATURES.map((feature) => (
-            <div key={feature.title} className={styles.featureCard}>
-              <span className={styles.featureIcon}>{feature.icon}</span>
-              <h3>{feature.title}</h3>
-              <p>{feature.text}</p>
-            </div>
+          {FEATURES.map((feature, index) => (
+            <ScrollReveal key={feature.title} delay={index * 0.1}>
+              <motion.div
+                className={styles.featureCard}
+                whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(79, 70, 229, 0.2)" }}
+                transition={{ duration: 0.3 }}
+              >
+                <span className={styles.featureIcon}>{feature.icon}</span>
+                <h3>{feature.title}</h3>
+                <p>{feature.text}</p>
+              </motion.div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* --- Qanday ishlaydi --- */}
       <section id="how" className={styles.how}>
-        <h2>3 qadamda ishga tushiring</h2>
+        <ScrollReveal>
+          <h2>3 qadamda ishga tushiring</h2>
+        </ScrollReveal>
         <div className={styles.steps}>
           {STEPS.map((step) => (
-            <div key={step.number} className={styles.step}>
-              <span className={styles.stepNumber}>{step.number}</span>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </div>
+            <ScrollReveal key={step.number} delay={parseInt(step.number) * 0.15}>
+              <motion.div
+                className={styles.step}
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.span
+                  className={styles.stepNumber}
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: parseInt(step.number) * 0.3 }}
+                >
+                  {step.number}
+                </motion.span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </motion.div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* --- Narxlar --- */}
       <section id="pricing" className={styles.pricing}>
-        <h2>Oddiy va oshkora narxlar</h2>
-        <p className={styles.pricingNote}>
-          Narxlar dastlabki — rasmiy ishga tushishda aniqlashtiriladi
-        </p>
+        <ScrollReveal>
+          <h2>Oddiy va oshkora narxlar</h2>
+        </ScrollReveal>
+        <ScrollReveal delay={0.1}>
+          <p className={styles.pricingNote}>
+            Narxlar dastlabki — rasmiy ishga tushishda aniqlashtiriladi
+          </p>
+        </ScrollReveal>
         <div className={styles.planGrid}>
-          {PLANS.map((plan) => (
-            <div
-              key={plan.name}
-              className={`${styles.plan} ${plan.highlighted ? styles.planHighlighted : ""}`}
-            >
+          {PLANS.map((plan, index) => (
+            <ScrollReveal key={plan.name} delay={index * 0.15}>
+              <motion.div
+                className={`${styles.plan} ${plan.highlighted ? styles.planHighlighted : ""}`}
+                whileHover={{ y: -10, boxShadow: "0 30px 60px rgba(79, 70, 229, 0.2)" }}
+                transition={{ duration: 0.3 }}
+              >
               {plan.highlighted && (
                 <span className={styles.planBadge}>Eng ommabop</span>
               )}
@@ -299,7 +369,8 @@ export default function LandingPage() {
               >
                 {plan.cta}
               </Link>
-            </div>
+              </motion.div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
