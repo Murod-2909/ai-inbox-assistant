@@ -123,6 +123,7 @@
 // --- Hero ---
 
 .hero {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 48px;
@@ -132,6 +133,8 @@
 }
 
 .heroText {
+  position: relative;
+  z-index: 1;
   flex: 1;
 
   h1 {
@@ -167,6 +170,8 @@
 
 // Mini dashboard mock (CSS bilan)
 .heroPreview {
+  position: relative;
+  z-index: 1;
   flex: 1;
   display: flex;
   gap: 10px;

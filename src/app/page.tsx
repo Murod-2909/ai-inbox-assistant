@@ -1,7 +1,18 @@
 // Landing (bosh) sahifa — struktura chatterapp.io / crisp.chat kabi
 // SaaS landinglardan o'rganilgan: hero → kanallar → xususiyatlar →
 // qadamlar → narxlar → FAQ → CTA → footer. Dizayn — o'zimizniki.
+//
+// Animatsiyalar: scroll-reveal, magnetik CTA tugmalar, 3D tilt kartalar,
+// fonda suzib yuruvchi "xabar" zarrachalari (mahsulot mavzusiga mos) —
+// barchasi src/components/animations va src/components/cursor'da.
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
+import { Magnetic } from "@/components/animations/Magnetic";
+import { TiltCard } from "@/components/animations/TiltCard";
+import { MessageParticles } from "@/components/animations/MessageParticles";
 import styles from "./landing.module.scss";
 
 const FEATURES = [
@@ -131,15 +142,23 @@ export default function LandingPage() {
           <Link href="/login" className={styles.ghostButton}>
             Kirish
           </Link>
-          <Link href="/signup" className={styles.primaryButton}>
-            Bepul boshlash
-          </Link>
+          <Magnetic strength={0.4}>
+            <Link href="/signup" className={styles.primaryButton}>
+              Bepul boshlash
+            </Link>
+          </Magnetic>
         </div>
       </nav>
 
       {/* --- Hero --- */}
       <header className={styles.hero}>
-        <div className={styles.heroText}>
+        <MessageParticles count={24} />
+        <motion.div
+          className={styles.heroText}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        >
           <h1>
             Barcha mijoz xabarlari.
             <br />
@@ -151,57 +170,67 @@ export default function LandingPage() {
             javob takliflari bilan mijozlarga 3 barobar tez javob bering.
           </p>
           <div className={styles.heroCtas}>
-            <Link href="/signup" className={styles.primaryButtonLarge}>
-              Bepul boshlash
-            </Link>
-            <Link href="/inbox" className={styles.ghostButtonLarge}>
-              Jonli demo ko&apos;rish
-            </Link>
+            <Magnetic strength={0.35}>
+              <Link href="/signup" className={styles.primaryButtonLarge}>
+                Bepul boshlash
+              </Link>
+            </Magnetic>
+            <Magnetic strength={0.35}>
+              <Link href="/inbox" className={styles.ghostButtonLarge}>
+                Jonli demo ko&apos;rish
+              </Link>
+            </Magnetic>
           </div>
           <span className={styles.heroNote}>
             Karta talab qilinmaydi · 5 daqiqada ulanish
           </span>
-        </div>
+        </motion.div>
 
-        {/* Mini dashboard ko'rinishi (CSS bilan chizilgan) */}
-        <div className={styles.heroPreview} aria-hidden="true">
-          <div className={styles.previewList}>
-            <div className={styles.previewRow}>
-              <span className={`${styles.previewDot} ${styles.dotGreen}`} />
-              <div>
-                <strong>Dilnoza K.</strong>
-                <small>Ertaga 15:00 ga yozilsam...</small>
+        {/* Mini dashboard ko'rinishi — 3D tilt bilan */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <TiltCard className={styles.heroPreview} maxTilt={6} ariaHidden>
+            <div className={styles.previewList}>
+              <div className={styles.previewRow}>
+                <span className={`${styles.previewDot} ${styles.dotGreen}`} />
+                <div>
+                  <strong>Dilnoza K.</strong>
+                  <small>Ertaga 15:00 ga yozilsam...</small>
+                </div>
+              </div>
+              <div className={`${styles.previewRow} ${styles.previewRowActive}`}>
+                <span className={`${styles.previewDot} ${styles.dotRed}`} />
+                <div>
+                  <strong>Jasur T.</strong>
+                  <small>Buyurtmam kelmayapti!</small>
+                </div>
+              </div>
+              <div className={styles.previewRow}>
+                <span className={`${styles.previewDot} ${styles.dotAmber}`} />
+                <div>
+                  <strong>Madina R.</strong>
+                  <small>Narxi qancha?</small>
+                </div>
               </div>
             </div>
-            <div className={`${styles.previewRow} ${styles.previewRowActive}`}>
-              <span className={`${styles.previewDot} ${styles.dotRed}`} />
-              <div>
-                <strong>Jasur T.</strong>
-                <small>Buyurtmam kelmayapti!</small>
+            <div className={styles.previewPanel}>
+              <div className={styles.previewBadges}>
+                <span>😠 Salbiy</span>
+                <span>⚠️ Shikoyat</span>
+              </div>
+              <div className={styles.previewBubble}>
+                Buyurtmam 3 kundan beri kelmayapti!
+              </div>
+              <div className={styles.previewSuggestion}>
+                ✨ AI taklifi: &quot;Uzr so&apos;raymiz! Buyurtma raqamingizni
+                yuboring, hoziroq tekshiramiz.&quot;
               </div>
             </div>
-            <div className={styles.previewRow}>
-              <span className={`${styles.previewDot} ${styles.dotAmber}`} />
-              <div>
-                <strong>Madina R.</strong>
-                <small>Narxi qancha?</small>
-              </div>
-            </div>
-          </div>
-          <div className={styles.previewPanel}>
-            <div className={styles.previewBadges}>
-              <span>😠 Salbiy</span>
-              <span>⚠️ Shikoyat</span>
-            </div>
-            <div className={styles.previewBubble}>
-              Buyurtmam 3 kundan beri kelmayapti!
-            </div>
-            <div className={styles.previewSuggestion}>
-              ✨ AI taklifi: &quot;Uzr so&apos;raymiz! Buyurtma raqamingizni
-              yuboring, hoziroq tekshiramiz.&quot;
-            </div>
-          </div>
-        </div>
+          </TiltCard>
+        </motion.div>
       </header>
 
       {/* --- Kimlar uchun --- */}
@@ -217,113 +246,151 @@ export default function LandingPage() {
 
       {/* --- Kanallar --- */}
       <section className={styles.channels}>
-        <h2>Mijozlaringiz qayerda bo&apos;lsa — siz ham o&apos;sha yerdasiz</h2>
+        <ScrollReveal>
+          <h2>Mijozlaringiz qayerda bo&apos;lsa — siz ham o&apos;sha yerdasiz</h2>
+        </ScrollReveal>
         <div className={styles.channelCards}>
-          <div className={`${styles.channelCard} ${styles.channelActive}`}>
-            <span className={styles.channelIcon}>✈️</span>
-            <strong>Telegram</strong>
-            <em>Faol</em>
-          </div>
-          <div className={styles.channelCard}>
-            <span className={styles.channelIcon}>💚</span>
-            <strong>WhatsApp</strong>
-            <em>Tez orada</em>
-          </div>
-          <div className={styles.channelCard}>
-            <span className={styles.channelIcon}>📸</span>
-            <strong>Instagram</strong>
-            <em>Tez orada</em>
-          </div>
+          <ScrollReveal delay={0}>
+            <div className={`${styles.channelCard} ${styles.channelActive}`}>
+              <span className={styles.channelIcon}>✈️</span>
+              <strong>Telegram</strong>
+              <em>Faol</em>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal delay={0.08}>
+            <div className={styles.channelCard}>
+              <span className={styles.channelIcon}>💚</span>
+              <strong>WhatsApp</strong>
+              <em>Tez orada</em>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal delay={0.16}>
+            <div className={styles.channelCard}>
+              <span className={styles.channelIcon}>📸</span>
+              <strong>Instagram</strong>
+              <em>Tez orada</em>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* --- Xususiyatlar --- */}
       <section id="features" className={styles.features}>
-        <h2>Kichik jamoa uchun katta imkoniyatlar</h2>
+        <ScrollReveal>
+          <h2>Kichik jamoa uchun katta imkoniyatlar</h2>
+        </ScrollReveal>
         <div className={styles.featureGrid}>
-          {FEATURES.map((feature) => (
-            <div key={feature.title} className={styles.featureCard}>
-              <span className={styles.featureIcon}>{feature.icon}</span>
-              <h3>{feature.title}</h3>
-              <p>{feature.text}</p>
-            </div>
+          {FEATURES.map((feature, i) => (
+            <ScrollReveal key={feature.title} delay={i * 0.06}>
+              <TiltCard className={styles.featureCard} maxTilt={8}>
+                <span className={styles.featureIcon}>{feature.icon}</span>
+                <h3>{feature.title}</h3>
+                <p>{feature.text}</p>
+              </TiltCard>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* --- Qanday ishlaydi --- */}
       <section id="how" className={styles.how}>
-        <h2>3 qadamda ishga tushiring</h2>
+        <ScrollReveal>
+          <h2>3 qadamda ishga tushiring</h2>
+        </ScrollReveal>
         <div className={styles.steps}>
-          {STEPS.map((step) => (
-            <div key={step.number} className={styles.step}>
-              <span className={styles.stepNumber}>{step.number}</span>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </div>
+          {STEPS.map((step, i) => (
+            <ScrollReveal key={step.number} delay={i * 0.12}>
+              <div className={styles.step}>
+                <motion.span
+                  className={styles.stepNumber}
+                  initial={{ scale: 0.6, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15, delay: i * 0.12 }}
+                >
+                  {step.number}
+                </motion.span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* --- Narxlar --- */}
       <section id="pricing" className={styles.pricing}>
-        <h2>Oddiy va oshkora narxlar</h2>
-        <p className={styles.pricingNote}>
-          Narxlar dastlabki — rasmiy ishga tushishda aniqlashtiriladi
-        </p>
+        <ScrollReveal>
+          <h2>Oddiy va oshkora narxlar</h2>
+        </ScrollReveal>
+        <ScrollReveal delay={0.05}>
+          <p className={styles.pricingNote}>
+            Narxlar dastlabki — rasmiy ishga tushishda aniqlashtiriladi
+          </p>
+        </ScrollReveal>
         <div className={styles.planGrid}>
-          {PLANS.map((plan) => (
-            <div
-              key={plan.name}
-              className={`${styles.plan} ${plan.highlighted ? styles.planHighlighted : ""}`}
-            >
-              {plan.highlighted && (
-                <span className={styles.planBadge}>Eng ommabop</span>
-              )}
-              <h3>{plan.name}</h3>
-              <div className={styles.planPrice}>
-                {plan.price} <small>{plan.unit}</small>
-              </div>
-              <ul>
-                {plan.features.map((feature) => (
-                  <li key={feature}>✓ {feature}</li>
-                ))}
-              </ul>
-              <Link
-                href={plan.name === "Bepul" ? "/inbox" : "/checkout"}
-                className={
-                  plan.highlighted
-                    ? styles.primaryButton
-                    : styles.ghostButton
-                }
+          {PLANS.map((plan, i) => (
+            <ScrollReveal key={plan.name} delay={i * 0.1}>
+              <TiltCard
+                className={`${styles.plan} ${plan.highlighted ? styles.planHighlighted : ""}`}
+                maxTilt={6}
               >
-                {plan.cta}
-              </Link>
-            </div>
+                {plan.highlighted && (
+                  <span className={styles.planBadge}>Eng ommabop</span>
+                )}
+                <h3>{plan.name}</h3>
+                <div className={styles.planPrice}>
+                  {plan.price} <small>{plan.unit}</small>
+                </div>
+                <ul>
+                  {plan.features.map((feature) => (
+                    <li key={feature}>✓ {feature}</li>
+                  ))}
+                </ul>
+                <Magnetic strength={0.3}>
+                  <Link
+                    href={plan.name === "Bepul" ? "/inbox" : "/checkout"}
+                    className={
+                      plan.highlighted ? styles.primaryButton : styles.ghostButton
+                    }
+                  >
+                    {plan.cta}
+                  </Link>
+                </Magnetic>
+              </TiltCard>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* --- FAQ --- */}
       <section id="faq" className={styles.faq}>
-        <h2>Ko&apos;p so&apos;raladigan savollar</h2>
+        <ScrollReveal>
+          <h2>Ko&apos;p so&apos;raladigan savollar</h2>
+        </ScrollReveal>
         <div className={styles.faqList}>
-          {FAQ.map((item) => (
-            <details key={item.q} className={styles.faqItem}>
-              <summary>{item.q}</summary>
-              <p>{item.a}</p>
-            </details>
+          {FAQ.map((item, i) => (
+            <ScrollReveal key={item.q} delay={i * 0.06}>
+              <details className={styles.faqItem}>
+                <summary>{item.q}</summary>
+                <p>{item.a}</p>
+              </details>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* --- Yakuniy CTA --- */}
       <section className={styles.finalCta}>
-        <h2>Mijozlaringizni kuttirmang</h2>
-        <p>Bugun ulaning — birinchi xabarlar 5 daqiqada inbox&apos;ingizda.</p>
-        <Link href="/signup" className={styles.primaryButtonLarge}>
-          Bepul boshlash
-        </Link>
+        <ScrollReveal>
+          <h2>Mijozlaringizni kuttirmang</h2>
+          <p>Bugun ulaning — birinchi xabarlar 5 daqiqada inbox&apos;ingizda.</p>
+          <Magnetic strength={0.35}>
+            <Link href="/signup" className={styles.primaryButtonLarge}>
+              Bepul boshlash
+            </Link>
+          </Magnetic>
+        </ScrollReveal>
       </section>
 
       {/* --- Footer --- */}

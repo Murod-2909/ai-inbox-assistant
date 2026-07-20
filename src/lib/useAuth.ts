@@ -21,14 +21,12 @@ export function useAuth() {
     getSession();
 
     // Auth state o'zgarishlarni kuzatamiz (login/logout)
-    const { data: subscription } = supabase?.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      },
-    ) ?? { data: null };
+    const result = supabase?.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
 
     return () => {
-      subscription?.unsubscribe();
+      result?.data.subscription.unsubscribe();
     };
   }, []);
 
