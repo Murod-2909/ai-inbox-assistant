@@ -86,24 +86,39 @@ export default function InboxView() {
     }
 
     if (supabase) {
+      console.log("[realtime] subscribing to inbox changes");
       const channel = supabase
-        .channel("inbox-changes")
+        .channel("inbox-changes", { config: { broadcast: { self: true } } })
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "messages" },
-          refresh,
+          (payload) => {
+            console.log("[realtime] message change:", payload.eventType);
+            refresh();
+          },
         )
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "conversations" },
-          refresh,
+          (payload) => {
+            console.log("[realtime] conversation change:", payload.eventType);
+            refresh();
+          },
         )
-        .subscribe();
+        .subscribe((status, err) => {
+          console.log(`[realtime] subscription status: ${status}`, err);
+          if (status === "SUBSCRIBED") {
+            console.log("[realtime] ✓ Supabase Realtime active (no polling)");
+          }
+        });
       return () => {
+        console.log("[realtime] unsubscribing");
         supabase?.removeChannel(channel);
       };
     }
 
+    // Supabase yo'q bo'lsa polling (SQLite rejimida)
+    console.log("[polling] Supabase not available, using 4s polling");
     const timer = setInterval(refresh, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
   }, [mode, applyConversations]);
