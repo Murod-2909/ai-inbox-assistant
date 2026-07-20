@@ -4,3 +4,4 @@ uvicorn[standard]  # serverni ishga tushiruvchi (ASGI server)
 anthropic          # Claude API — xabar tahlili uchun
 httpx              # HTTP so'rovlar — Telegram API'ga xabar yuborish uchun
 python-dotenv      # .env faylidan sozlamalarni o'qish
+supabase>=2,<3     # Supabase (Postgres) klienti — kalitlar berilganda ishlaydi

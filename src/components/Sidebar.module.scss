@@ -94,6 +94,27 @@
 .businessName {
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+}
+
+.logoutButton {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-sm;
+  border: 1px solid $color-border;
+  font-size: 15px;
+  color: $color-text-muted;
+  flex-shrink: 0;
+
+  &:hover {
+    color: $color-danger;
+    border-color: $color-danger;
+  }
 }
 
 .businessPlan {

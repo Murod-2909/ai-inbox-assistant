@@ -44,3 +44,6 @@ next-env.d.ts
 backend/.venv/
 __pycache__/
 *.db
+
+# example env fayllari commit qilinadi
+!.env*.example

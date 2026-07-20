@@ -9,6 +9,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import GoogleButton from "@/components/auth/GoogleButton";
+import { supabase } from "@/lib/supabase";
 import styles from "../auth.module.scss";
 
 type Step = "form" | "verify" | "onboarding";
@@ -26,6 +27,8 @@ export default function SignupPage() {
 
   const [businessName, setBusinessName] = useState("");
   const [category, setCategory] = useState("");
+  const [serverError, setServerError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   function validate(): boolean {
     const found: Record<string, string> = {};
@@ -36,9 +39,31 @@ export default function SignupPage() {
     return Object.keys(found).length === 0;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (validate()) setStep("verify"); // demo: email haqiqatda yuborilmaydi
+    setServerError("");
+    if (!validate()) return;
+
+    // Supabase ulangan bo'lsa — haqiqiy ro'yxatdan o'tish (tasdiqlash xati yuboriladi)
+    if (supabase) {
+      setSubmitting(true);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        // full_name -> schema.sql dagi trigger operators jadvaliga yozadi
+        options: { data: { full_name: name.trim() } },
+      });
+      setSubmitting(false);
+      if (error) {
+        setServerError(
+          error.message === "User already registered"
+            ? "Bu email allaqachon ro'yxatdan o'tgan — Kirish sahifasidan foydalaning"
+            : "Ro'yxatdan o'tishda xatolik: " + error.message,
+        );
+        return;
+      }
+    }
+    setStep("verify"); // Supabase'siz demo: xat yuborilmaydi
   }
 
   function finishOnboarding() {
@@ -127,6 +152,8 @@ export default function SignupPage() {
       <GoogleButton label="Google bilan davom etish" />
       <div className={styles.divider}>yoki email bilan</div>
 
+      {serverError && <div className={styles.errorBanner}>{serverError}</div>}
+
       <form onSubmit={handleSubmit} noValidate>
         <div className={`${styles.field} ${errors.name ? styles.fieldError : ""}`}>
           <label htmlFor="name">Ismingiz</label>
@@ -170,8 +197,8 @@ export default function SignupPage() {
           )}
         </div>
 
-        <button type="submit" className={styles.submitButton}>
-          Ro&apos;yxatdan o&apos;tish
+        <button type="submit" className={styles.submitButton} disabled={submitting}>
+          {submitting ? "Yaratilmoqda..." : "Ro'yxatdan o'tish"}
         </button>
       </form>
 

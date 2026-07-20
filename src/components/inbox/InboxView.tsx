@@ -6,6 +6,7 @@ import * as api from "@/lib/api";
 import { mockConversations, mockMessages } from "@/lib/mock-data";
 import { incomingEvents } from "@/lib/mock-realtime";
 import { playNewMessageSound } from "@/lib/sound";
+import { supabase } from "@/lib/supabase";
 import ConversationList from "./ConversationList";
 import MessagePanel from "./MessagePanel";
 import styles from "./InboxView.module.scss";
@@ -68,11 +69,13 @@ export default function InboxView() {
     };
   }, [applyConversations]);
 
-  // Backend rejim: polling — har necha soniyada yangiliklarni tortamiz
+  // Backend rejim: yangilanishlarni olish.
+  // Supabase ulangan bo'lsa — Realtime obuna (bazadagi har bir o'zgarish
+  // darhol keladi, polling shart emas); bo'lmasa — 4 soniyalik polling.
   useEffect(() => {
     if (mode !== "backend") return;
 
-    const timer = setInterval(async () => {
+    async function refresh() {
       const fresh = await api.fetchConversations();
       if (fresh) applyConversations(fresh);
       const current = selectedIdRef.current;
@@ -80,8 +83,28 @@ export default function InboxView() {
         const freshMessages = await api.fetchMessages(current);
         if (freshMessages) setMessages(freshMessages);
       }
-    }, POLL_INTERVAL_MS);
+    }
 
+    if (supabase) {
+      const channel = supabase
+        .channel("inbox-changes")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "messages" },
+          refresh,
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "conversations" },
+          refresh,
+        )
+        .subscribe();
+      return () => {
+        supabase?.removeChannel(channel);
+      };
+    }
+
+    const timer = setInterval(refresh, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
   }, [mode, applyConversations]);
 

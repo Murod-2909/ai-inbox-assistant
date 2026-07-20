@@ -15,7 +15,7 @@ import os
 import re
 from typing import Optional
 
-from app import database
+from app.store import db as database
 
 # --- Sozlamalar ---
 CLASSIFY_MODEL = "claude-haiku-4-5"   # arzon/tezkor — sentiment+intent uchun

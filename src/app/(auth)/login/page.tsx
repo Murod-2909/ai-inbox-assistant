@@ -7,6 +7,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import GoogleButton from "@/components/auth/GoogleButton";
+import { supabase } from "@/lib/supabase";
 import styles from "../auth.module.scss";
 
 export default function LoginPage() {
@@ -17,7 +18,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
@@ -27,9 +28,28 @@ export default function LoginPage() {
       return;
     }
 
-    // Demo: Supabase Auth ulangach signInWithPassword() bo'ladi.
-    // "remember" keyin sessiya muddatini belgilaydi.
     setLoading(true);
+
+    // Supabase ulangan bo'lsa — haqiqiy kirish
+    if (supabase) {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (authError) {
+        setLoading(false);
+        setError(
+          authError.message === "Email not confirmed"
+            ? "Email hali tasdiqlanmagan — pochtangizdagi havolani bosing"
+            : "Email yoki parol noto'g'ri. Qayta urinib ko'ring.",
+        );
+        return;
+      }
+      router.push("/inbox");
+      return;
+    }
+
+    // Demo rejim (Supabase'siz)
     setTimeout(() => router.push("/inbox"), 600);
   }
 

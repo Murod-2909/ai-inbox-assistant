@@ -1,18 +1,28 @@
 "use client";
 
 // Google OAuth tugmasi — namunalardagidek formaning ENG TEPASIDA turadi.
-// Supabase Auth ulangach signInWithOAuth({provider: "google"}) chaqiriladi.
+// Supabase ulangan bo'lsa haqiqiy OAuth oqimini boshlaydi,
+// bo'lmasa demo ogohlantirishini ko'rsatadi.
+import { supabase } from "@/lib/supabase";
 import styles from "@/app/(auth)/auth.module.scss";
 
 export default function GoogleButton({ label }: { label: string }) {
+  async function handleClick() {
+    if (!supabase) {
+      alert("Google orqali kirish Supabase Auth ulangach ishlaydi (demo)");
+      return;
+    }
+    // Muvaffaqiyatli kirishdan keyin foydalanuvchi inbox'ga qaytadi.
+    // Eslatma: Supabase dashboard'da Google provider yoqilgan bo'lishi kerak
+    // (docs/supabase-setup.md, 5-qadam).
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/inbox` },
+    });
+  }
+
   return (
-    <button
-      type="button"
-      className={styles.googleButton}
-      onClick={() =>
-        alert("Google orqali kirish Supabase Auth ulangach ishlaydi (demo)")
-      }
-    >
+    <button type="button" className={styles.googleButton} onClick={handleClick}>
       <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
         <path
           fill="#EA4335"

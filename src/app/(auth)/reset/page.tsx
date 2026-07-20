@@ -5,6 +5,7 @@
 // har doim "yuborildi" deb ko'rsatamiz (namunalardagi standart yondashuv).
 import { useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 import styles from "../auth.module.scss";
 
 export default function ResetPage() {
@@ -12,14 +13,22 @@ export default function ResetPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       setError("Email manzilini to'g'ri kiriting");
       return;
     }
     setError("");
-    setSent(true); // demo: Supabase resetPasswordForEmail() bo'ladi
+
+    if (supabase) {
+      // Natijadan qat'i nazar "yuborildi" deymiz — email bazada bor-yo'qligini
+      // oshkor qilmaslik uchun (xatoni ham yutamiz)
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+    }
+    setSent(true);
   }
 
   if (sent) {

@@ -77,11 +77,14 @@ create table if not exists analyses (
 );
 
 -- Ichki eslatmalar (operatorlar orasida, mijoz ko'rmaydi) — 5-bo'lim
+-- operator_id ixtiyoriy: backend service-key bilan yozganda (auth'siz demo)
+-- author matni ishlatiladi; Auth to'liq ulangach operator_id to'ldiriladi.
 create table if not exists internal_notes (
     id uuid primary key default gen_random_uuid(),
     business_id uuid not null references businesses (id) on delete cascade,
     conversation_id uuid not null references conversations (id) on delete cascade,
-    operator_id uuid not null references operators (id),
+    operator_id uuid references operators (id),
+    author text not null default 'Operator',
     text text not null,
     created_at timestamptz not null default now()
 );
@@ -167,3 +170,109 @@ create policy "read own audit" on audit_log
 -- (polling o'rniga). RLS Realtime'da ham amal qiladi.
 alter publication supabase_realtime add table messages;
 alter publication supabase_realtime add table conversations;
+
+-- ---------- Boshlang'ich ma'lumotlar ----------
+
+-- Default biznes: loyiha hozircha bitta biznes bilan ishlaydi (single-tenant).
+-- Ko'p biznesga o'tilganda har signup o'z biznesini yaratadigan qilinadi.
+insert into businesses (name)
+select 'Demo biznes'
+where not exists (select 1 from businesses);
+
+-- Boshlang'ich javob shablonlari
+insert into reply_templates (business_id, title, text)
+select b.id, t.title, t.text
+from (select id from businesses limit 1) b,
+     (values
+        ('Salomlashish', 'Assalomu alaykum! Xush kelibsiz, sizga qanday yordam bera olamiz?'),
+        ('Ish vaqti', 'Ish vaqtimiz: dushanba–shanba, 9:00 dan 18:00 gacha.'),
+        ('Kutish', 'Xabaringizni oldik! Mutaxassisimiz tez orada javob beradi.'),
+        ('Rahmat', 'Murojaatingiz uchun rahmat! Yana savollaringiz bo''lsa, bemalol yozing.')
+     ) as t(title, text)
+where not exists (select 1 from reply_templates);
+
+-- ---------- Auth trigger ----------
+-- Yangi Supabase Auth foydalanuvchisi ro'yxatdan o'tganda avtomatik ravishda
+-- operators jadvaliga yozib, default biznesga bog'laymiz.
+create or replace function handle_new_user() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+    insert into operators (id, business_id, full_name)
+    values (
+        new.id,
+        (select id from businesses order by created_at limit 1),
+        coalesce(new.raw_user_meta_data ->> 'full_name', '')
+    );
+    return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+    after insert on auth.users
+    for each row execute function handle_new_user();
+
+-- ---------- Backend uchun qulay view ----------
+-- Suhbatlar ro'yxati: mijoz ma'lumoti + suhbatning ENG OXIRGI AI tahlili.
+-- security_invoker = on: view so'rovni chaqiruvchining huquqlari bilan bajaradi,
+-- ya'ni RLS bu yerda ham amal qiladi.
+create or replace view conversation_overview
+with (security_invoker = on) as
+select
+    c.id, c.business_id, c.last_message, c.last_message_at, c.unread_count,
+    cu.id  as customer_id, cu.name, cu.channel, cu.username,
+    a.sentiment, a.intent, a.suggested_reply
+from conversations c
+join customers cu on cu.id = c.customer_id
+left join lateral (
+    select an.sentiment, an.intent, an.suggested_reply
+    from analyses an
+    join messages m on m.id = an.message_id
+    where m.conversation_id = c.id
+    order by m.sent_at desc
+    limit 1
+) a on true;
+
+-- ---------- Statistika funksiyasi ----------
+-- Tahlil sahifasining barcha agregatlari bitta so'rovda (backend RPC chaqiradi).
+-- Kalitlar frontend kutadigan camelCase formatda.
+create or replace function get_stats() returns jsonb
+language sql stable as $$
+select jsonb_build_object(
+    'todayMessages', (
+        select count(*) from messages
+        where sender = 'customer' and sent_at::date = now()::date
+    ),
+    'unanswered', (
+        select count(*) from conversations where unread_count > 0
+    ),
+    'avgResponseMinutes', (
+        select round(avg(extract(epoch from (m.sent_at - prev.asked_at)) / 60)::numeric, 1)
+        from messages m
+        cross join lateral (
+            select max(p.sent_at) as asked_at from messages p
+            where p.conversation_id = m.conversation_id
+              and p.sender = 'customer' and p.sent_at < m.sent_at
+        ) prev
+        where m.sender = 'business' and prev.asked_at is not null
+    ),
+    'sentiment', jsonb_build_object(
+        'positive', (select count(*) from analyses where sentiment = 'positive'),
+        'neutral',  (select count(*) from analyses where sentiment = 'neutral'),
+        'negative', (select count(*) from analyses where sentiment = 'negative')
+    ),
+    'intents', coalesce((
+        select jsonb_agg(jsonb_build_object('intent', intent, 'count', n) order by n desc)
+        from (select intent, count(*) as n from analyses group by intent) i
+    ), '[]'::jsonb),
+    'week', coalesce((
+        select jsonb_object_agg(day, n)
+        from (
+            select sent_at::date::text as day, count(*) as n
+            from messages
+            where sender = 'customer' and sent_at >= now() - interval '6 days'
+            group by sent_at::date
+        ) w
+    ), '{}'::jsonb)
+);
+$$;

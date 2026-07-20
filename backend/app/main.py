@@ -17,7 +17,8 @@ from fastapi import FastAPI, HTTPException  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import Response  # noqa: E402
 
-from app import ai, database, telegram  # noqa: E402
+from app import ai, telegram  # noqa: E402
+from app.store import SUPABASE_ENABLED, db as database  # noqa: E402
 from app.schemas import NoteRequest, ReplyRequest, TemplateRequest  # noqa: E402
 
 app = FastAPI(title="AI Inbox Assistant API", version="0.1.0")
@@ -33,13 +34,14 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup() -> None:
-    """Server ishga tushganda baza jadvallarini tayyorlaymiz."""
+    """Server ishga tushganda bazani tayyorlaymiz (SQLite yoki Supabase)."""
     database.init_db()
+    print(f"[store] Baza rejimi: {'Supabase' if SUPABASE_ENABLED else 'SQLite (lokal)'}")
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {"status": "ok", "store": "supabase" if SUPABASE_ENABLED else "sqlite"}
 
 
 # ---------- Frontend uchun API ----------
