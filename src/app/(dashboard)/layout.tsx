@@ -1,4 +1,7 @@
+"use client";
+
 import Sidebar from "@/components/Sidebar";
+import { ProtectedLayout } from "@/components/ProtectedLayout";
 import styles from "./layout.module.scss";
 
 export default function DashboardLayout({
@@ -7,9 +10,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className={styles.shell}>
-      <Sidebar />
-      <main className={styles.content}>{children}</main>
-    </div>
+    <ProtectedLayout>
+      <div className={styles.shell}>
+        <Sidebar />
+        <main className={styles.content}>{children}</main>
+      </div>
+    </ProtectedLayout>
   );
 }
