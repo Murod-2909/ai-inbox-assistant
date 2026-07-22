@@ -1,0 +1,173 @@
+@use "@/styles/variables" as *;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 20px;
+}
+
+.modal {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 720px;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+}
+
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: $color-text-muted;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: $color-bg;
+    color: $color-text;
+  }
+}
+
+.left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 28px;
+  min-width: 0;
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 13px;
+    color: $color-text-muted;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+}
+
+.chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  background: $color-bg;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 8px 10px;
+
+  span {
+    font-size: 15px;
+  }
+}
+
+.cta {
+  margin-top: auto;
+  align-self: flex-start;
+  background: $color-primary;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: $radius-md;
+  padding: 10px 22px;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, $color-primary-soft, $color-bg);
+  padding: 28px;
+  min-width: 0;
+}
+
+.demo {
+  width: 100%;
+  max-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.demoBubble {
+  align-self: flex-end;
+  max-width: 85%;
+  font-size: 12px;
+  background: $color-primary;
+  color: #fff;
+  border-radius: $radius-md;
+  padding: 8px 12px;
+}
+
+.demoAnalysis {
+  display: flex;
+  gap: 6px;
+
+  span {
+    font-size: 10px;
+    border: 1px solid $color-border;
+    border-radius: 999px;
+    padding: 3px 9px;
+    background: $color-surface;
+    color: $color-text-muted;
+  }
+}
+
+.demoReply {
+  font-size: 11px;
+  line-height: 1.4;
+  color: $color-primary;
+  background: $color-surface;
+  border: 1px dashed $color-primary;
+  border-radius: $radius-md;
+  padding: 9px 11px;
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .modal {
+    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .left {
+    padding: 24px 20px;
+  }
+
+  .chips {
+    grid-template-columns: 1fr;
+  }
+
+  .right {
+    padding: 24px 20px 32px;
+  }
+}

@@ -7,6 +7,7 @@ import { mockConversations, mockMessages } from "@/lib/mock-data";
 import { incomingEvents } from "@/lib/mock-realtime";
 import { playNewMessageSound } from "@/lib/sound";
 import { supabase } from "@/lib/supabase";
+import { WelcomeModal } from "@/components/WelcomeModal";
 import ConversationList from "./ConversationList";
 import MessagePanel from "./MessagePanel";
 import styles from "./InboxView.module.scss";
@@ -207,6 +208,7 @@ export default function InboxView() {
 
   return (
     <div className={styles.wrapper}>
+      <WelcomeModal />
       {mode === "mock" && (
         <div className={styles.demoBanner}>
           Demo rejim — backend ulanmagan (namunaviy ma&apos;lumotlar)
