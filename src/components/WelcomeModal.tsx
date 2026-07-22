@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "./WelcomeModal.module.scss";
 
@@ -19,6 +20,7 @@ const FEATURE_CHIPS = [
 // Fabrikatsiya qilingan "asoschi videosi" o'rniga o'zimizning haqiqiy mahsulot
 // oqimini animatsion tarzda ko'rsatamiz (soxta odam/sharh yo'q).
 export function WelcomeModal() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -38,6 +40,11 @@ export function WelcomeModal() {
     } catch {
       // e'tiborsiz qoldiramiz — keyingi safar qayta ko'rsatiladi, xato emas
     }
+  }
+
+  function startOnboarding() {
+    dismiss();
+    router.push("/onboarding");
   }
 
   return (
@@ -78,7 +85,7 @@ export function WelcomeModal() {
                 ))}
               </div>
 
-              <button className={styles.cta} onClick={dismiss}>
+              <button className={styles.cta} onClick={startOnboarding}>
                 Ishga tushirish
               </button>
             </div>

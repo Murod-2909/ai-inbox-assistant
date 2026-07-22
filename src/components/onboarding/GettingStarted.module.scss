@@ -1,0 +1,217 @@
+@use "@/styles/variables" as *;
+
+.page {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  h1 {
+    font-size: 20px;
+    font-weight: 700;
+  }
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: $color-text-muted;
+  min-width: 160px;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: $color-border;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: $color-primary;
+  border-radius: 999px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+
+.itemHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  text-align: left;
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid $color-border;
+  font-size: 12px;
+  color: #fff;
+}
+
+.checkDone {
+  background: $color-success;
+  border-color: $color-success;
+}
+
+.itemTitle {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.chevron {
+  color: $color-text-muted;
+  font-size: 16px;
+}
+
+.itemBody {
+  overflow: hidden;
+}
+
+.itemBodyInner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 18px 20px 52px;
+}
+
+.itemText {
+  flex: 1;
+  min-width: 0;
+
+  p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: $color-text-muted;
+    margin-bottom: 14px;
+    max-width: 440px;
+  }
+}
+
+.itemCta {
+  display: inline-block;
+  background: $color-primary;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: $radius-md;
+  padding: 9px 18px;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.soonBadge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-text-muted;
+  background: $color-bg;
+  border: 1px solid $color-border;
+  border-radius: 999px;
+  padding: 6px 14px;
+}
+
+.itemVisual {
+  flex-shrink: 0;
+  width: 220px;
+}
+
+.skip {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 13px;
+  color: $color-text-muted;
+
+  &:hover {
+    color: $color-text;
+  }
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+
+  h2 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+}
+
+.resource {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: $color-text-muted;
+  padding: 9px 0;
+
+  span {
+    font-size: 15px;
+  }
+
+  &:hover {
+    color: $color-text;
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .page {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .itemBodyInner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 18px;
+  }
+
+  .itemVisual {
+    width: 100%;
+    max-width: 220px;
+    align-self: center;
+  }
+}

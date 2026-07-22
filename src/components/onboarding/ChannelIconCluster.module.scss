@@ -1,0 +1,35 @@
+@use "@/styles/variables" as *;
+
+.cluster {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 1;
+  border-radius: $radius-lg;
+  background: linear-gradient(150deg, $color-primary, $color-primary-soft 140%);
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.bubble {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: $color-surface;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.bubbleFaded {
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: none;
+  color: $color-surface;
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .cluster {
+    max-width: 200px;
+  }
+}
