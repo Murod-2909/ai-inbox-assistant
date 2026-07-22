@@ -1,0 +1,106 @@
+@use "@/styles/variables" as *;
+
+.wrapper {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  background: $color-bg;
+  padding: 24px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 380px;
+
+  h1 {
+    font-size: 56px;
+    font-weight: 800;
+    color: $color-primary;
+    line-height: 1;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 10px 0 8px;
+  }
+
+  p {
+    font-size: 14px;
+    color: $color-text-muted;
+    line-height: 1.6;
+    margin-bottom: 26px;
+  }
+}
+
+.bubbleStack {
+  position: relative;
+  width: 110px;
+  height: 90px;
+  margin-bottom: 24px;
+}
+
+.bubbleBack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 78px;
+  height: 56px;
+  border-radius: $radius-lg;
+  background: $color-primary-soft;
+  border: 1px solid $color-border;
+}
+
+.bubbleFront {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: $radius-lg;
+  background: $color-primary;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 700;
+  box-shadow: $shadow-md;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.primaryButton,
+.ghostButton {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: $radius-md;
+  padding: 10px 20px;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.primaryButton {
+  background: $color-primary;
+  color: #fff;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.ghostButton {
+  color: $color-text;
+  border: 1px solid $color-border;
+
+  &:hover {
+    background: $color-surface;
+  }
+}
