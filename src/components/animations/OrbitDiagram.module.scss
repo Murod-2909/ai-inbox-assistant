@@ -1,0 +1,134 @@
+@use "@/styles/variables" as *;
+
+.orbit {
+  position: relative;
+  width: 360px;
+  height: 360px;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.ring,
+.ringOuter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  border: 1px dashed $color-border;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ring {
+  width: 200px;
+  height: 200px;
+}
+
+.ringOuter {
+  width: 320px;
+  height: 320px;
+  opacity: 0.6;
+}
+
+.center {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: $color-primary;
+  font-size: 30px;
+  box-shadow: $shadow-md;
+}
+
+// Har bir kanal shu "uyacha"da joylashadi: markazdan berilgan burchak
+// bo'yicha radiusga chiqariladi, so'ng orqaga aylantiriladi — shu sabab
+// bubble har doim tik turadi, burchagidan qat'i nazar.
+.itemSlot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--angle)) translate(160px) rotate(calc(-1 * var(--angle)));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.item {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-sm;
+  cursor: default;
+}
+
+.itemActive {
+  border-color: $color-primary;
+  box-shadow: 0 0 0 3px $color-primary-soft;
+}
+
+.itemIcon {
+  font-size: 24px;
+}
+
+.itemLabel {
+  text-align: center;
+  white-space: nowrap;
+
+  strong {
+    display: block;
+    font-size: 12px;
+  }
+
+  small {
+    display: block;
+    font-size: 10px;
+    color: $color-text-muted;
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .orbit {
+    width: 280px;
+    height: 280px;
+  }
+
+  .ring {
+    width: 150px;
+    height: 150px;
+  }
+
+  .ringOuter {
+    width: 240px;
+    height: 240px;
+  }
+
+  .itemSlot {
+    transform: rotate(var(--angle)) translate(120px) rotate(calc(-1 * var(--angle)));
+  }
+
+  .center {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+
+  .item {
+    width: 46px;
+    height: 46px;
+  }
+
+  .itemIcon {
+    font-size: 20px;
+  }
+}

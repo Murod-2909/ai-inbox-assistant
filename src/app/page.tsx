@@ -3,8 +3,9 @@
 // qadamlar → narxlar → FAQ → CTA → footer. Dizayn — o'zimizniki.
 //
 // Animatsiyalar: scroll-reveal, magnetik CTA tugmalar, 3D tilt kartalar,
-// fonda suzib yuruvchi "xabar" zarrachalari (mahsulot mavzusiga mos) —
-// barchasi src/components/animations va src/components/cursor'da.
+// fonda suzib yuruvchi "xabar" zarrachalari, kanallar orbit diagrammasi,
+// soha ko'rgazmasi (hover-expand) — barchasi src/components/animations
+// va src/components/cursor'da.
 "use client";
 
 import Link from "next/link";
@@ -13,6 +14,8 @@ import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Magnetic } from "@/components/animations/Magnetic";
 import { TiltCard } from "@/components/animations/TiltCard";
 import { MessageParticles } from "@/components/animations/MessageParticles";
+import { OrbitDiagram } from "@/components/animations/OrbitDiagram";
+import { IndustryShowcase } from "@/components/animations/IndustryShowcase";
 import styles from "./landing.module.scss";
 
 const FEATURES = [
@@ -64,6 +67,43 @@ const STEPS = [
     title: "AI bilan javob bering",
     text: "Tahlil va tayyor javob taklifini ko'rib, bir bosishda yuboring.",
   },
+];
+
+const INDUSTRIES = [
+  {
+    icon: "🛍",
+    title: "Do'konlar",
+    subtitle: "Mahsulot va buyurtma savollari",
+    detail:
+      "Narx, mavjudlik va yetkazib berish holati haqidagi savollarga AI darhol javob taklif qiladi — siz faqat tasdiqlaysiz.",
+  },
+  {
+    icon: "🏥",
+    title: "Klinikalar",
+    subtitle: "Navbat va konsultatsiya so'rovlari",
+    detail:
+      "Bemorlarning yozilish va ish vaqti haqidagi murojaatlari avtomatik tartiblanadi, shoshilinch xabarlar ajratib ko'rsatiladi.",
+  },
+  {
+    icon: "💇",
+    title: "Salonlar",
+    subtitle: "Yozilish va bandlik savollari",
+    detail:
+      "Mijozlar bo'sh vaqtlarni so'raganda, tayyor javob shablonlari bilan bir necha soniyada javob bering.",
+  },
+  {
+    icon: "📚",
+    title: "O'quv markazlari",
+    subtitle: "Kurs va ro'yxatga olish savollari",
+    detail:
+      "Kurs narxi, jadvali va ro'yxatdan o'tish bo'yicha takroriy savollarni AI hal qiladi, murakkab holatlar operatorga qoladi.",
+  },
+];
+
+const CHANNELS = [
+  { icon: "✈️", label: "Telegram", status: "Faol", active: true, angle: 0 },
+  { icon: "💚", label: "WhatsApp", status: "Tez orada", angle: 120 },
+  { icon: "📸", label: "Instagram", status: "Tez orada", angle: 240 },
 ];
 
 const PLANS = [
@@ -233,45 +273,24 @@ export default function LandingPage() {
         </motion.div>
       </header>
 
-      {/* --- Kimlar uchun --- */}
+      {/* --- Kimlar uchun (soha ko'rgazmasi) --- */}
       <section className={styles.audience}>
-        <span>Kimlar uchun:</span>
-        <div className={styles.audienceChips}>
-          <span>🛍 Do&apos;konlar</span>
-          <span>🏥 Klinikalar</span>
-          <span>💇 Salonlar</span>
-          <span>📚 O&apos;quv markazlari</span>
-        </div>
+        <ScrollReveal>
+          <h2>Sohangizga moslashtirilgan</h2>
+        </ScrollReveal>
+        <ScrollReveal delay={0.05}>
+          <IndustryShowcase items={INDUSTRIES} />
+        </ScrollReveal>
       </section>
 
-      {/* --- Kanallar --- */}
+      {/* --- Kanallar (orbit diagramma) --- */}
       <section className={styles.channels}>
         <ScrollReveal>
           <h2>Mijozlaringiz qayerda bo&apos;lsa — siz ham o&apos;sha yerdasiz</h2>
         </ScrollReveal>
-        <div className={styles.channelCards}>
-          <ScrollReveal delay={0}>
-            <div className={`${styles.channelCard} ${styles.channelActive}`}>
-              <span className={styles.channelIcon}>✈️</span>
-              <strong>Telegram</strong>
-              <em>Faol</em>
-            </div>
-          </ScrollReveal>
-          <ScrollReveal delay={0.08}>
-            <div className={styles.channelCard}>
-              <span className={styles.channelIcon}>💚</span>
-              <strong>WhatsApp</strong>
-              <em>Tez orada</em>
-            </div>
-          </ScrollReveal>
-          <ScrollReveal delay={0.16}>
-            <div className={styles.channelCard}>
-              <span className={styles.channelIcon}>📸</span>
-              <strong>Instagram</strong>
-              <em>Tez orada</em>
-            </div>
-          </ScrollReveal>
-        </div>
+        <ScrollReveal delay={0.08}>
+          <OrbitDiagram centerIcon="💬" items={CHANNELS} />
+        </ScrollReveal>
       </section>
 
       {/* --- Xususiyatlar --- */}
