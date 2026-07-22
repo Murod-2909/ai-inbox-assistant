@@ -78,8 +78,12 @@ export default function SignupPage() {
         <p>
           <strong>{email}</strong> manziliga tasdiqlash havolasi yubordik.
           Havolani bosganingizdan so&apos;ng hisobingiz faollashadi.
-          <br />
-          (Demo rejim — hozircha xat yuborilmaydi)
+          {!supabase && (
+            <>
+              <br />
+              (Demo rejim — hozircha xat yuborilmaydi)
+            </>
+          )}
         </p>
         <button
           className={styles.submitButton}
