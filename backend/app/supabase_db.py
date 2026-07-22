@@ -17,7 +17,8 @@ import os
 from datetime import datetime, timezone
 from typing import Optional
 
-from supabase import Client, create_client
+import httpx
+from supabase import Client, ClientOptions, create_client
 
 _client: Optional[Client] = None
 _business_id: Optional[str] = None  # default biznes (hozircha single-tenant)
@@ -28,12 +29,23 @@ def now_iso() -> str:
 
 
 def _sb() -> Client:
-    """Supabase klientini qaytaradi (birinchi chaqiruvda yaratadi)."""
+    """Supabase klientini qaytaradi (birinchi chaqiruvda yaratadi).
+
+    httpx_client'ga retryli transport beramiz: ba'zi tarmoqlarda/eski
+    LibreSSL bilan (macOS'ning tizim Python'ida keng tarqalgan) uzoq
+    turgan keep-alive ulanishlar "ReadError: Resource temporarily
+    unavailable" bilan tasodifiy uzilib qoladi — transport darajasidagi
+    avtomatik retry buni sezilarli darajada kamaytiradi.
+    """
     global _client
     if _client is None:
+        transport = httpx.HTTPTransport(retries=3)
         _client = create_client(
             os.environ["SUPABASE_URL"],
             os.environ["SUPABASE_SERVICE_KEY"],
+            options=ClientOptions(
+                httpx_client=httpx.Client(transport=transport, timeout=30)
+            ),
         )
     return _client
 
