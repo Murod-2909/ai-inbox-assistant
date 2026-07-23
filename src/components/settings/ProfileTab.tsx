@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import * as api from "@/lib/api";
-import type { WorkingHours } from "@/lib/types";
+import type { PlanTier, WorkingHours } from "@/lib/types";
 import styles from "./ProfileTab.module.scss";
 
 const DEFAULT_HOURS: WorkingHours = {
@@ -13,10 +14,17 @@ const DEFAULT_HOURS: WorkingHours = {
     "Assalomu alaykum! Hozir ish vaqtimiz tugagan. Ertaga siz bilan albatta bog'lanamiz.",
 };
 
+const PLAN_LABEL: Record<PlanTier, string> = {
+  free: "Bepul",
+  start: "Start",
+  business: "Biznes",
+};
+
 export function ProfileTab() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [hours, setHours] = useState<WorkingHours>(DEFAULT_HOURS);
+  const [plan, setPlan] = useState<PlanTier>("free");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -27,6 +35,7 @@ export function ProfileTab() {
       if (biz) {
         setName(biz.name);
         setHours(biz.workingHours ?? DEFAULT_HOURS);
+        setPlan(biz.plan);
       }
       setLoading(false);
     });
@@ -52,6 +61,18 @@ export function ProfileTab() {
 
   return (
     <div className={styles.card}>
+      <section className={styles.section}>
+        <div className={styles.rowHeader}>
+          <h3>Joriy tarif</h3>
+          <span className={styles.planBadge}>{PLAN_LABEL[plan]}</span>
+        </div>
+        {plan !== "business" && (
+          <Link href="/checkout" className={styles.upgradeLink}>
+            Tarifni yangilash →
+          </Link>
+        )}
+      </section>
+
       <section className={styles.section}>
         <h3>Biznes nomi</h3>
         <input

@@ -21,6 +21,7 @@ create table if not exists businesses (
     facebook_page_id text,
     facebook_page_token text,
     working_hours jsonb,              -- ish vaqti (avto-javob uchun), masalan {"mon": ["09:00","18:00"]}
+    plan text not null default 'free' check (plan in ('free', 'start', 'business')),
     created_at timestamptz not null default now()
 );
 

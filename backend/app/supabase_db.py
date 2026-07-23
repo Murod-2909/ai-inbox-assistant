@@ -372,12 +372,16 @@ def get_stats() -> dict:
 def get_business() -> dict:
     row = (
         _sb().table("businesses")
-        .select("name, working_hours")
+        .select("name, working_hours, plan")
         .eq("id", _biz())
         .execute()
         .data[0]
     )
-    return {"name": row["name"], "workingHours": row.get("working_hours")}
+    return {
+        "name": row["name"],
+        "workingHours": row.get("working_hours"),
+        "plan": row.get("plan", "free"),
+    }
 
 
 def update_business(name: Optional[str], working_hours: Optional[dict]) -> dict:
@@ -389,6 +393,11 @@ def update_business(name: Optional[str], working_hours: Optional[dict]) -> dict:
     if update:
         _sb().table("businesses").update(update).eq("id", _biz()).execute()
     return get_business()
+
+
+def set_plan(plan: str) -> None:
+    """Faqat Stripe webhook chaqiradi — foydalanuvchi o'zi to'g'ridan-to'g'ri o'zgartira olmaydi."""
+    _sb().table("businesses").update({"plan": plan}).eq("id", _biz()).execute()
 
 
 # ---------- Jamoa ----------

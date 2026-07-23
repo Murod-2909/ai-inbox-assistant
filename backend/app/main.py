@@ -15,7 +15,7 @@ from datetime import datetime, time as dtime  # noqa: E402
 from typing import Optional  # noqa: E402
 
 import httpx  # noqa: E402
-from fastapi import FastAPI, HTTPException, Query  # noqa: E402
+from fastapi import FastAPI, HTTPException, Query, Request  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import Response  # noqa: E402
 
@@ -209,7 +209,9 @@ def delete_template(template_id: str) -> dict:
 
 @app.get("/api/business")
 def get_business() -> dict:
-    return database.get_business()
+    biz = database.get_business()
+    biz["operatorLimit"] = PLAN_LIMITS.get(biz.get("plan", "free"), 1)
+    return biz
 
 
 @app.put("/api/business")
@@ -233,6 +235,18 @@ def get_team() -> list:
 def invite_team(body: InviteRequest) -> dict:
     if not SUPABASE_ENABLED:
         raise HTTPException(status_code=501, detail="Jamoa funksiyasi faqat Supabase ulanganda ishlaydi")
+
+    plan = database.get_business().get("plan", "free")
+    limit = PLAN_LIMITS.get(plan, 1)
+    if limit is not None and len(database.list_team()) >= limit:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                f"'{plan}' tarifida operator limiti {limit} taga yetdi. "
+                "Ko'proq operator qo'shish uchun tarifni yangilang."
+            ),
+        )
+
     try:
         return database.invite_team_member(body.email, body.fullName)
     except Exception as error:
@@ -287,6 +301,9 @@ PRICING = {
     },
 }
 
+# Tarif bo'yicha operator soni chegarasi — None = cheksiz.
+PLAN_LIMITS = {"free": 1, "start": 3, "business": None}
+
 
 @app.post("/api/checkout")
 async def create_checkout(body: dict) -> dict:
@@ -319,11 +336,41 @@ async def create_checkout(body: dict) -> dict:
             ],
             mode="subscription",
             ui_mode="embedded",
+            metadata={"plan": plan},
             return_url=f"{os.getenv('API_URL', 'http://localhost:3000')}/success",
         )
         return {"clientSecret": session.client_secret}
     except stripe.error.StripeError as e:
         raise HTTPException(status_code=500, detail=f"Stripe xatosi: {str(e)}")
+
+
+@app.post("/webhook/stripe")
+async def stripe_webhook(request: Request) -> dict:
+    """To'lov muvaffaqiyatli o'tgach, biznesning tarifini yangilaydi.
+
+    Stripe Dashboard'da webhook endpoint sifatida ro'yxatdan o'tkazilishi va
+    STRIPE_WEBHOOK_SECRET .env'ga qo'yilishi kerak (imzoni tekshirish uchun —
+    aks holda istalgan kishi soxta so'rov yuborib tarifni o'zgartira oladi).
+    """
+    webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+    if not webhook_secret:
+        raise HTTPException(status_code=500, detail="STRIPE_WEBHOOK_SECRET sozlanmagan")
+
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature", "")
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+    except (ValueError, stripe.error.SignatureVerificationError):
+        raise HTTPException(status_code=400, detail="Noto'g'ri webhook imzosi")
+
+    if event["type"] == "checkout.session.completed":
+        session = event["data"]["object"]
+        plan = (session.get("metadata") or {}).get("plan")
+        if plan in PRICING:
+            database.set_plan(plan)
+            print(f"[stripe] Tarif yangilandi: {plan}")
+
+    return {"ok": True}
 
 
 def _is_within_working_hours(working_hours: Optional[dict]) -> bool:

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import * as api from "@/lib/api";
 import type { TeamMember } from "@/lib/types";
 import styles from "./TeamTab.module.scss";
@@ -18,6 +19,7 @@ const STATUS_LABEL: Record<TeamMember["status"], string> = {
 
 export function TeamTab() {
   const [members, setMembers] = useState<TeamMember[] | null>(null);
+  const [operatorLimit, setOperatorLimit] = useState<number | null>(1);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
@@ -26,14 +28,18 @@ export function TeamTab() {
   const [invited, setInvited] = useState<string | null>(null);
 
   useEffect(() => {
-    api.fetchTeam().then((list) => {
+    Promise.all([api.fetchTeam(), api.fetchBusiness()]).then(([list, biz]) => {
       setMembers(list);
+      if (biz) setOperatorLimit(biz.operatorLimit);
       setLoading(false);
     });
   }, []);
 
+  const atLimit =
+    members !== null && operatorLimit !== null && members.length >= operatorLimit;
+
   async function handleInvite() {
-    if (!email.trim()) return;
+    if (!email.trim() || atLimit) return;
     setInviting(true);
     setError(null);
     setInvited(null);
@@ -66,27 +72,40 @@ export function TeamTab() {
   return (
     <div className={styles.wrap}>
       <div className={styles.card}>
-        <h3>Jamoaga taklif qilish</h3>
-        <div className={styles.form}>
-          <input
-            type="email"
-            placeholder="email@misol.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            placeholder="Ismi (ixtiyoriy)"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-          <button onClick={handleInvite} disabled={inviting || !email.trim()}>
-            {inviting ? "Yuborilmoqda..." : "Taklif yuborish"}
-          </button>
-          {invited && (
-            <p className={styles.success}>{invited} manziliga taklif yuborildi ✓</p>
-          )}
-          {error && <p className={styles.error}>{error}</p>}
+        <div className={styles.rowHeader}>
+          <h3>Jamoaga taklif qilish</h3>
+          <span className={styles.usage}>
+            {members.length}/{operatorLimit ?? "∞"} operator
+          </span>
         </div>
+
+        {atLimit ? (
+          <p className={styles.limitNote}>
+            Joriy tarifingizda operator limiti to&apos;ldi.{" "}
+            <Link href="/checkout">Tarifni yangilang →</Link>
+          </p>
+        ) : (
+          <div className={styles.form}>
+            <input
+              type="email"
+              placeholder="email@misol.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              placeholder="Ismi (ixtiyoriy)"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+            <button onClick={handleInvite} disabled={inviting || !email.trim()}>
+              {inviting ? "Yuborilmoqda..." : "Taklif yuborish"}
+            </button>
+            {invited && (
+              <p className={styles.success}>{invited} manziliga taklif yuborildi ✓</p>
+            )}
+            {error && <p className={styles.error}>{error}</p>}
+          </div>
+        )}
       </div>
 
       <div className={styles.card}>

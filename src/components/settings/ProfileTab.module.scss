@@ -41,6 +41,26 @@
   justify-content: space-between;
 }
 
+.planBadge {
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-primary;
+  background: $color-primary-soft;
+  border-radius: 999px;
+  padding: 3px 12px;
+}
+
+.upgradeLink {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-primary;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .hint {
   font-size: 12px;
   color: $color-text-muted;

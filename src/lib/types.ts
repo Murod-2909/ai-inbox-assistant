@@ -80,9 +80,13 @@ export interface WorkingHours {
   message: string;
 }
 
+export type PlanTier = "free" | "start" | "business";
+
 export interface Business {
   name: string;
   workingHours: WorkingHours | null;
+  plan: PlanTier;
+  operatorLimit: number | null; // null = cheksiz
 }
 
 // Jamoa a'zosi (faqat Supabase ulanganda mazmunli — operators jadvali)

@@ -595,13 +595,14 @@ def get_customer_channel_info(conversation_id: str) -> Optional[dict]:
 def get_business() -> dict:
     conn = get_connection()
     rows = conn.execute(
-        "SELECT key, value FROM settings WHERE key IN ('business_name', 'working_hours')"
+        "SELECT key, value FROM settings WHERE key IN ('business_name', 'working_hours', 'plan')"
     ).fetchall()
     conn.close()
     values = {r["key"]: r["value"] for r in rows}
     return {
         "name": values.get("business_name", "Demo biznes"),
         "workingHours": json.loads(values["working_hours"]) if "working_hours" in values else None,
+        "plan": values.get("plan", "free"),
     }
 
 
@@ -622,6 +623,17 @@ def update_business(name: Optional[str], working_hours: Optional[dict]) -> dict:
     conn.commit()
     conn.close()
     return get_business()
+
+
+def set_plan(plan: str) -> None:
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO settings (key, value) VALUES ('plan', ?)"
+        " ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+        (plan,),
+    )
+    conn.commit()
+    conn.close()
 
 
 # ---------- Jamoa ----------
