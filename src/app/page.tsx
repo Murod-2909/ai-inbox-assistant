@@ -114,6 +114,7 @@ const CHANNELS = [
 const PLANS = [
   {
     name: "Bepul",
+    slug: "free",
     price: "0",
     unit: "so'm/oy",
     features: ["1 operator", "Telegram kanali", "Oyiga 100 AI tahlil", "Asosiy statistika"],
@@ -122,6 +123,7 @@ const PLANS = [
   },
   {
     name: "Start",
+    slug: "start",
     price: "149 000",
     unit: "so'm/oy",
     features: [
@@ -136,6 +138,7 @@ const PLANS = [
   },
   {
     name: "Biznes",
+    slug: "business",
     price: "349 000",
     unit: "so'm/oy",
     features: [
@@ -373,7 +376,9 @@ export default function LandingPage() {
                 </ul>
                 <Magnetic strength={0.3}>
                   <Link
-                    href={plan.name === "Bepul" ? "/inbox" : "/checkout"}
+                    href={
+                      plan.slug === "free" ? "/inbox" : `/checkout?plan=${plan.slug}`
+                    }
                     className={
                       plan.highlighted ? styles.primaryButton : styles.ghostButton
                     }

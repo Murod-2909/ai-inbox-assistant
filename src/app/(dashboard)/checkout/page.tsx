@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   EmbeddedCheckout,
@@ -63,8 +64,24 @@ const PLANS: Record<Plan, PlanDetails> = {
   },
 };
 
+function isPlan(value: string | null): value is Plan {
+  return value === "free" || value === "start" || value === "business";
+}
+
 export default function CheckoutPage() {
-  const [selectedPlan, setSelectedPlan] = useState<Plan>("start");
+  return (
+    <Suspense fallback={null}>
+      <CheckoutContent />
+    </Suspense>
+  );
+}
+
+function CheckoutContent() {
+  const searchParams = useSearchParams();
+  const requestedPlan = searchParams.get("plan");
+  const [selectedPlan, setSelectedPlan] = useState<Plan>(
+    isPlan(requestedPlan) ? requestedPlan : "start",
+  );
   const [showCheckout, setShowCheckout] = useState(false);
   const [clientSecret, setClientSecret] = useState<string>("");
 
