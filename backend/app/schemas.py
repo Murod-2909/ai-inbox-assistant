@@ -72,3 +72,27 @@ class AssignRequest(BaseModel):
     shuning uchun operator ID'ni frontend Supabase sessiyasidan o'zi yuboradi.
     """
     operatorId: Optional[str] = None
+
+
+class WorkingHours(BaseModel):
+    """Har kuni bir xil vaqt oralig'i — soddalashtirilgan model.
+
+    Yoqilsa, shu oraliqdan tashqarida kelgan birinchi xabarga avtomatik
+    javob yuboriladi (webhook handlerlarda ishlatiladi).
+    """
+    enabled: bool = False
+    start: str = "09:00"  # "HH:MM"
+    end: str = "18:00"
+    message: str = "Ish vaqtimiz tugadi. Ertaga javob beramiz!"
+
+
+class BusinessUpdateRequest(BaseModel):
+    """PUT /api/business — ikkala maydon ham ixtiyoriy, faqat berilgani yangilanadi."""
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    workingHours: Optional[WorkingHours] = None
+
+
+class InviteRequest(BaseModel):
+    """POST /api/team/invite — jamoaga yangi operator taklif qilish."""
+    email: str = Field(min_length=3, max_length=200)
+    fullName: Optional[str] = None

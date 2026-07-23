@@ -1,6 +1,6 @@
 // Domen turlari — keyinchalik Supabase jadvallariga mos keladi
 
-export type Channel = "telegram" | "whatsapp" | "instagram";
+export type Channel = "telegram" | "whatsapp" | "instagram" | "facebook";
 
 export type Sentiment = "positive" | "neutral" | "negative";
 
@@ -70,4 +70,25 @@ export interface Stats {
   sentiment: { positive: number; neutral: number; negative: number };
   intents: { intent: string; count: number }[];
   week: Record<string, number>; // "YYYY-MM-DD" -> xabarlar soni
+}
+
+// Ish vaqti — yoqilsa, shu oraliqdan tashqarida avtomatik javob yuboriladi
+export interface WorkingHours {
+  enabled: boolean;
+  start: string; // "HH:MM"
+  end: string;
+  message: string;
+}
+
+export interface Business {
+  name: string;
+  workingHours: WorkingHours | null;
+}
+
+// Jamoa a'zosi (faqat Supabase ulanganda mazmunli — operators jadvali)
+export interface TeamMember {
+  id: string;
+  fullName: string;
+  role: "owner" | "operator";
+  status: "available" | "busy" | "offline";
 }

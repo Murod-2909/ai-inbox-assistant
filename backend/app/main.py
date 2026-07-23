@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 load_dotenv()  # .env faylidagi sozlamalarni os.getenv() orqali o'qiladigan qilamiz
 
 import os  # noqa: E402
+from datetime import datetime, time as dtime  # noqa: E402
+from typing import Optional  # noqa: E402
 
 import httpx  # noqa: E402
 from fastapi import FastAPI, HTTPException, Query  # noqa: E402
@@ -21,7 +23,14 @@ import stripe  # noqa: E402
 
 from app import ai, meta, telegram  # noqa: E402
 from app.store import SUPABASE_ENABLED, db as database  # noqa: E402
-from app.schemas import AssignRequest, NoteRequest, ReplyRequest, TemplateRequest  # noqa: E402
+from app.schemas import (  # noqa: E402
+    AssignRequest,
+    BusinessUpdateRequest,
+    InviteRequest,
+    NoteRequest,
+    ReplyRequest,
+    TemplateRequest,
+)
 
 # Stripe setup
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
@@ -196,6 +205,40 @@ def delete_template(template_id: str) -> dict:
     return {"ok": True}
 
 
+# ---------- Biznes profili ----------
+
+@app.get("/api/business")
+def get_business() -> dict:
+    return database.get_business()
+
+
+@app.put("/api/business")
+def update_business(body: BusinessUpdateRequest) -> dict:
+    working_hours = body.workingHours.model_dump() if body.workingHours else None
+    return database.update_business(body.name, working_hours)
+
+
+# ---------- Jamoa ----------
+# Faqat Supabase ulanganda ma'noga ega — SQLite (demo) rejimida haqiqiy
+# autentifikatsiya yo'q, shuning uchun aniq xato bilan rad etamiz.
+
+@app.get("/api/team")
+def get_team() -> list:
+    if not SUPABASE_ENABLED:
+        raise HTTPException(status_code=501, detail="Jamoa funksiyasi faqat Supabase ulanganda ishlaydi")
+    return database.list_team()
+
+
+@app.post("/api/team/invite")
+def invite_team(body: InviteRequest) -> dict:
+    if not SUPABASE_ENABLED:
+        raise HTTPException(status_code=501, detail="Jamoa funksiyasi faqat Supabase ulanganda ishlaydi")
+    try:
+        return database.invite_team_member(body.email, body.fullName)
+    except Exception as error:
+        raise HTTPException(status_code=400, detail=f"Taklif yuborishda xato: {error}")
+
+
 # ---------- Ichki eslatmalar ----------
 
 @app.get("/api/conversations/{conversation_id}/notes")
@@ -283,6 +326,34 @@ async def create_checkout(body: dict) -> dict:
         raise HTTPException(status_code=500, detail=f"Stripe xatosi: {str(e)}")
 
 
+def _is_within_working_hours(working_hours: Optional[dict]) -> bool:
+    """Ish vaqti yoqilmagan bo'lsa — cheklov yo'q, doim "ish vaqti" hisoblanadi."""
+    if not working_hours or not working_hours.get("enabled"):
+        return True
+    now = datetime.now().time()
+    start = dtime.fromisoformat(working_hours["start"])
+    end = dtime.fromisoformat(working_hours["end"])
+    return start <= now <= end
+
+
+def _maybe_send_away_message(conversation_id: str, channel: str, recipient: object) -> None:
+    """Ish vaqtidan tashqarida kelgan xabarga avtomatik javob yuboradi
+    (throttlingsiz — MVP: har bir xabar uchun, ko'p bo'lsa keyinroq cheklash mumkin)."""
+    business = database.get_business()
+    working_hours = business.get("workingHours")
+    if _is_within_working_hours(working_hours):
+        return
+
+    away_text = working_hours["message"]
+    delivered = (
+        telegram.send_message(recipient, away_text)
+        if channel == "telegram"
+        else meta.send_message(recipient, away_text)
+    )
+    if delivered:
+        database.add_message(conversation_id, "business", away_text)
+
+
 # ---------- Telegram webhook ----------
 
 @app.post("/telegram/webhook")
@@ -319,6 +390,8 @@ def telegram_webhook(update: dict) -> dict:
     if ai_text:
         ai.analyze_message(message["id"], ids["conversation_id"], ai_text)
 
+    _maybe_send_away_message(ids["conversation_id"], "telegram", parsed["chat_id"])
+
     return {"ok": True}
 
 
@@ -351,5 +424,6 @@ def meta_webhook(update: dict) -> dict:
         )
         message = database.add_message(ids["conversation_id"], "customer", event["text"])
         ai.analyze_message(message["id"], ids["conversation_id"], event["text"])
+        _maybe_send_away_message(ids["conversation_id"], event["platform"], event["sender_id"])
 
     return {"ok": True}

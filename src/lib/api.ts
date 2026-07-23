@@ -3,11 +3,14 @@
 // InboxView bu holatda mock (demo) rejimga o'tadi.
 
 import type {
+  Business,
   Conversation,
   InternalNote,
   Message,
   ReplyTemplate,
   Stats,
+  TeamMember,
+  WorkingHours,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -70,6 +73,52 @@ export function assignConversation(
 
 export function fetchTemplates(): Promise<ReplyTemplate[] | null> {
   return safeFetch<ReplyTemplate[]>("/api/templates");
+}
+
+export function createTemplate(
+  title: string,
+  text: string,
+): Promise<ReplyTemplate | null> {
+  return safeFetch<ReplyTemplate>("/api/templates", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, text }),
+  });
+}
+
+export function deleteTemplate(
+  templateId: string,
+): Promise<{ ok: boolean } | null> {
+  return safeFetch(`/api/templates/${templateId}`, { method: "DELETE" });
+}
+
+export function fetchBusiness(): Promise<Business | null> {
+  return safeFetch<Business>("/api/business");
+}
+
+export function updateBusiness(
+  data: { name?: string; workingHours?: WorkingHours },
+): Promise<Business | null> {
+  return safeFetch<Business>("/api/business", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export function fetchTeam(): Promise<TeamMember[] | null> {
+  return safeFetch<TeamMember[]>("/api/team");
+}
+
+export function inviteTeamMember(
+  email: string,
+  fullName?: string,
+): Promise<{ id: string; email: string } | null> {
+  return safeFetch("/api/team/invite", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, fullName }),
+  });
 }
 
 export function fetchNotes(

@@ -1,0 +1,53 @@
+@use "@/styles/variables" as *;
+
+.page {
+  max-width: 720px;
+}
+
+.header {
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: 14px;
+    color: $color-text-muted;
+  }
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid $color-border;
+  margin-bottom: 24px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-text-muted;
+  padding: 10px 14px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    color: $color-text;
+  }
+}
+
+.tabActive {
+  color: $color-primary;
+  border-color: $color-primary;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

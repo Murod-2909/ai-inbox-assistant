@@ -365,3 +365,59 @@ def add_note(conversation_id: str, author: str, text: str) -> dict:
 def get_stats() -> dict:
     """Barcha agregatlar Postgres'dagi get_stats() funksiyasida (schema.sql)."""
     return _sb().rpc("get_stats").execute().data
+
+
+# ---------- Biznes profili ----------
+
+def get_business() -> dict:
+    row = (
+        _sb().table("businesses")
+        .select("name, working_hours")
+        .eq("id", _biz())
+        .execute()
+        .data[0]
+    )
+    return {"name": row["name"], "workingHours": row.get("working_hours")}
+
+
+def update_business(name: Optional[str], working_hours: Optional[dict]) -> dict:
+    update: dict = {}
+    if name is not None:
+        update["name"] = name
+    if working_hours is not None:
+        update["working_hours"] = working_hours
+    if update:
+        _sb().table("businesses").update(update).eq("id", _biz()).execute()
+    return get_business()
+
+
+# ---------- Jamoa ----------
+
+def list_team() -> list:
+    rows = (
+        _sb().table("operators")
+        .select("id, full_name, role, status")
+        .eq("business_id", _biz())
+        .order("created_at")
+        .execute()
+        .data
+    )
+    return [
+        {"id": r["id"], "fullName": r["full_name"], "role": r["role"], "status": r["status"]}
+        for r in rows
+    ]
+
+
+def invite_team_member(email: str, full_name: Optional[str]) -> dict:
+    """Supabase Admin API orqali haqiqiy taklif xati yuboradi.
+
+    Havolani bosgach foydalanuvchi avtomatik sessiya bilan /inbox'ga tushadi
+    (Supabase invite/magic-link standart xatti-harakati). operators jadvaliga
+    yozuv schema.sql'dagi handle_new_user trigger orqali avtomatik qo'shiladi.
+    """
+    frontend_url = os.getenv("API_URL", "http://localhost:3000")
+    result = _sb().auth.admin.invite_user_by_email(
+        email,
+        {"data": {"full_name": full_name or ""}, "redirect_to": f"{frontend_url}/inbox"},
+    )
+    return {"id": result.user.id, "email": result.user.email}

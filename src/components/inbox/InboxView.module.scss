@@ -17,6 +17,23 @@
   padding: 8px 14px;
 }
 
+.notifBanner {
+  flex-shrink: 0;
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 500;
+  color: $color-primary;
+  background: $color-primary-soft;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 8px 14px;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
 .loading {
   display: grid;
   place-items: center;

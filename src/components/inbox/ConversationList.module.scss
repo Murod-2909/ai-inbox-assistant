@@ -28,6 +28,48 @@
   padding: 2px 8px;
 }
 
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid $color-border;
+
+  input {
+    width: 100%;
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 8px 30px;
+    font-size: 13px;
+    outline: none;
+
+    &:focus {
+      border-color: $color-primary;
+    }
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: 22px;
+  font-size: 15px;
+  color: $color-text-muted;
+  pointer-events: none;
+}
+
+.searchClear {
+  position: absolute;
+  right: 22px;
+  font-size: 11px;
+  color: $color-text-muted;
+  padding: 4px;
+
+  &:hover {
+    color: $color-text;
+  }
+}
+
 .filters {
   display: flex;
   gap: 4px;

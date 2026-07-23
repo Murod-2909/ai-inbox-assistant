@@ -586,3 +586,52 @@ def get_customer_channel_info(conversation_id: str) -> Optional[dict]:
     ).fetchone()
     conn.close()
     return dict(row) if row else None
+
+
+# ---------- Biznes profili ----------
+# settings jadvali kalit-qiymat: 'business_name' -> oddiy satr,
+# 'working_hours' -> JSON satr sifatida saqlanadi.
+
+def get_business() -> dict:
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT key, value FROM settings WHERE key IN ('business_name', 'working_hours')"
+    ).fetchall()
+    conn.close()
+    values = {r["key"]: r["value"] for r in rows}
+    return {
+        "name": values.get("business_name", "Demo biznes"),
+        "workingHours": json.loads(values["working_hours"]) if "working_hours" in values else None,
+    }
+
+
+def update_business(name: Optional[str], working_hours: Optional[dict]) -> dict:
+    conn = get_connection()
+    if name is not None:
+        conn.execute(
+            "INSERT INTO settings (key, value) VALUES ('business_name', ?)"
+            " ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            (name,),
+        )
+    if working_hours is not None:
+        conn.execute(
+            "INSERT INTO settings (key, value) VALUES ('working_hours', ?)"
+            " ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            (json.dumps(working_hours),),
+        )
+    conn.commit()
+    conn.close()
+    return get_business()
+
+
+# ---------- Jamoa ----------
+# SQLite (demo/lokal) rejimida haqiqiy autentifikatsiya yo'q — bitta
+# "operator" bilan ishlaydi, shuning uchun jamoa funksiyasi mazmunsiz.
+# Supabase ulanganda supabase_db.py'dagi haqiqiy variant ishlaydi.
+
+def list_team() -> list:
+    return []
+
+
+def invite_team_member(email: str, full_name: Optional[str]) -> dict:
+    raise RuntimeError("Jamoa funksiyasi faqat Supabase ulanganda ishlaydi")

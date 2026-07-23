@@ -6,6 +6,11 @@ import * as api from "@/lib/api";
 import { mockConversations, mockMessages } from "@/lib/mock-data";
 import { incomingEvents } from "@/lib/mock-realtime";
 import { playNewMessageSound } from "@/lib/sound";
+import {
+  getNotificationPermission,
+  requestNotificationPermission,
+  showMessageNotification,
+} from "@/lib/notifications";
 import { supabase } from "@/lib/supabase";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import ConversationList, { type InboxFilter } from "./ConversationList";
@@ -27,6 +32,19 @@ export default function InboxView() {
   const [flashId, setFlashId] = useState<string | null>(null);
   const [filter, setFilter] = useState<InboxFilter>("all");
   const [operatorId, setOperatorId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [notifPermission, setNotifPermission] = useState<
+    NotificationPermission | "unsupported"
+  >("default");
+
+  useEffect(() => {
+    setNotifPermission(getNotificationPermission());
+  }, []);
+
+  async function handleEnableNotifications() {
+    const result = await requestNotificationPermission();
+    setNotifPermission(result);
+  }
 
   const selectedIdRef = useRef(selectedId);
   selectedIdRef.current = selectedId;
@@ -55,6 +73,9 @@ export default function InboxView() {
         setFlashId(conv.id);
         setTimeout(() => setFlashId(null), 1400);
         playNewMessageSound();
+        showMessageNotification(conv.customer.name, conv.lastMessage, () =>
+          setSelectedId(conv.id),
+        );
       }
       lastSeenRef.current.set(conv.id, conv.lastMessageAt);
     }
@@ -170,6 +191,11 @@ export default function InboxView() {
         setFlashId(event.conversation.id);
         setTimeout(() => setFlashId(null), 1400);
         playNewMessageSound();
+        showMessageNotification(
+          event.conversation.customer.name,
+          event.message.text,
+          () => setSelectedId(event.conversation.id),
+        );
       }, event.delayMs),
     );
     return () => timers.forEach(clearTimeout);
@@ -182,13 +208,22 @@ export default function InboxView() {
 
   // Faqat backend rejimda va operator ma'lum bo'lsa filtr ma'noga ega
   const canFilter = mode === "backend" && !!operatorId;
-  const filtered = canFilter
+  const byOperator = canFilter
     ? sorted.filter((c) => {
         if (filter === "mine") return c.assignedOperatorId === operatorId;
         if (filter === "unassigned") return !c.assignedOperatorId;
         return true;
       })
     : sorted;
+  const query = searchQuery.trim().toLowerCase();
+  const filtered = query
+    ? byOperator.filter(
+        (c) =>
+          c.customer.name.toLowerCase().includes(query) ||
+          c.customer.username?.toLowerCase().includes(query) ||
+          c.lastMessage.toLowerCase().includes(query),
+      )
+    : byOperator;
   const filterCounts = {
     all: conversations.length,
     mine: conversations.filter((c) => c.assignedOperatorId === operatorId).length,
@@ -259,6 +294,14 @@ export default function InboxView() {
           Demo rejim — backend ulanmagan (namunaviy ma&apos;lumotlar)
         </div>
       )}
+      {notifPermission === "default" && (
+        <button
+          className={styles.notifBanner}
+          onClick={handleEnableNotifications}
+        >
+          🔔 Yangi xabarlar uchun bildirishnomalarni yoqish
+        </button>
+      )}
       <div className={styles.inbox}>
         <div
           className={`${styles.listPane} ${panelOpen ? styles.hideOnMobile : ""}`}
@@ -272,6 +315,8 @@ export default function InboxView() {
             onFilterChange={setFilter}
             filterCounts={filterCounts}
             showFilters={canFilter && conversations.length > 0}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
           />
         </div>
         <div

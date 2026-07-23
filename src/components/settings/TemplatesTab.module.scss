@@ -1,0 +1,104 @@
+@use "@/styles/variables" as *;
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: 22px;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  input,
+  textarea {
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+
+    &:focus {
+      border-color: $color-primary;
+    }
+  }
+
+  button {
+    align-self: flex-start;
+    background: $color-primary;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: $radius-md;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.hint {
+  font-size: 13px;
+  color: $color-text-muted;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 10px 12px;
+
+  strong {
+    font-size: 13px;
+  }
+
+  p {
+    font-size: 13px;
+    color: $color-text-muted;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+}
+
+.deleteBtn {
+  flex-shrink: 0;
+  color: $color-text-muted;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: $radius-sm;
+
+  &:hover {
+    color: $color-danger;
+    background: $color-danger-soft;
+  }
+}

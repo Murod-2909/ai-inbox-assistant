@@ -27,6 +27,8 @@ interface Props {
   onFilterChange: (filter: InboxFilter) => void;
   filterCounts: Record<InboxFilter, number>;
   showFilters: boolean;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
 }
 
 const FILTER_TABS: { key: InboxFilter; label: string }[] = [
@@ -44,12 +46,33 @@ export default function ConversationList({
   onFilterChange,
   filterCounts,
   showFilters,
+  searchQuery,
+  onSearchChange,
 }: Props) {
   return (
     <div className={styles.list}>
       <div className={styles.header}>
         <h2>Xabarlar</h2>
         <span className={styles.count}>{conversations.length}</span>
+      </div>
+
+      <div className={styles.searchBox}>
+        <span className={styles.searchIcon}>⌕</span>
+        <input
+          type="text"
+          placeholder="Qidirish..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+        {searchQuery && (
+          <button
+            className={styles.searchClear}
+            onClick={() => onSearchChange("")}
+            aria-label="Tozalash"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {showFilters && (
@@ -105,11 +128,13 @@ export default function ConversationList({
 
         {conversations.length === 0 && (
           <p className={styles.filterEmpty}>
-            {filter === "mine"
-              ? "Sizga tayinlangan suhbat yo'q"
-              : filter === "unassigned"
-                ? "Tayinlanmagan suhbat yo'q"
-                : "Suhbat yo'q"}
+            {searchQuery
+              ? `"${searchQuery}" bo'yicha hech narsa topilmadi`
+              : filter === "mine"
+                ? "Sizga tayinlangan suhbat yo'q"
+                : filter === "unassigned"
+                  ? "Tayinlanmagan suhbat yo'q"
+                  : "Suhbat yo'q"}
           </p>
         )}
       </div>
