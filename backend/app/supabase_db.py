@@ -14,7 +14,8 @@ shuning uchun main.py/ai.py ga o'zgartirish kerak emas.
 """
 
 import os
-from datetime import datetime, timezone
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import httpx
@@ -430,3 +431,90 @@ def invite_team_member(email: str, full_name: Optional[str]) -> dict:
         {"data": {"full_name": full_name or ""}, "redirect_to": f"{frontend_url}/inbox"},
     )
     return {"id": result.user.id, "email": result.user.email}
+
+
+# ---------- Hisobotlar (haftalik/oylik export) ----------
+
+def get_report_data(period: str) -> dict:
+    """period: 'week' (7 kun) yoki 'month' (30 kun) — bugunni ham qo'shib hisoblanadi."""
+    days = 7 if period == "week" else 30
+    since_date = (datetime.now(timezone.utc) - timedelta(days=days - 1)).date()
+    since_iso = since_date.isoformat()
+    since_ts = f"{since_iso}T00:00:00+00:00"
+
+    messages = (
+        _sb().table("messages")
+        .select("id, sender, sent_at, conversation_id")
+        .eq("business_id", _biz())
+        .gte("sent_at", since_ts)
+        .execute()
+        .data
+    )
+    total_customer = sum(1 for m in messages if m["sender"] == "customer")
+    total_business = sum(1 for m in messages if m["sender"] == "business")
+    unique_conversations = len({m["conversation_id"] for m in messages})
+
+    daily_map: dict = {}
+    for m in messages:
+        day = m["sent_at"][:10]
+        entry = daily_map.setdefault(day, {"customerMessages": 0, "businessReplies": 0})
+        if m["sender"] == "customer":
+            entry["customerMessages"] += 1
+        else:
+            entry["businessReplies"] += 1
+
+    analyses = (
+        _sb().table("analyses")
+        .select("sentiment, intent")
+        .eq("business_id", _biz())
+        .gte("created_at", since_ts)
+        .execute()
+        .data
+    )
+    sentiment = {"positive": 0, "neutral": 0, "negative": 0}
+    intent_counts: dict = defaultdict(int)
+    for a in analyses:
+        sentiment[a["sentiment"]] = sentiment.get(a["sentiment"], 0) + 1
+        intent_counts[a["intent"]] += 1
+    intents = [
+        {"intent": k, "count": v}
+        for k, v in sorted(intent_counts.items(), key=lambda kv: -kv[1])
+    ]
+
+    # O'rtacha javob vaqti: har bir suhbatda mijoz xabaridan keyingi birinchi
+    # biznes javobigacha o'tgan vaqt (daqiqa)
+    by_conv: dict = defaultdict(list)
+    for m in messages:
+        by_conv[m["conversation_id"]].append(m)
+    diffs = []
+    for msgs in by_conv.values():
+        msgs.sort(key=lambda m: m["sent_at"])
+        last_customer_at = None
+        for m in msgs:
+            if m["sender"] == "customer":
+                last_customer_at = m["sent_at"]
+            elif last_customer_at:
+                reply_time = datetime.fromisoformat(m["sent_at"].replace("Z", "+00:00"))
+                asked_time = datetime.fromisoformat(last_customer_at.replace("Z", "+00:00"))
+                diffs.append((reply_time - asked_time).total_seconds() / 60)
+                last_customer_at = None
+    avg_response = round(sum(diffs) / len(diffs), 1) if diffs else None
+
+    daily = []
+    for i in range(days - 1, -1, -1):
+        d = (datetime.now(timezone.utc) - timedelta(days=i)).date().isoformat()
+        entry = daily_map.get(d, {"customerMessages": 0, "businessReplies": 0})
+        daily.append({"date": d, **entry})
+
+    return {
+        "period": period,
+        "since": since_iso,
+        "until": datetime.now(timezone.utc).date().isoformat(),
+        "totalCustomerMessages": total_customer,
+        "totalBusinessReplies": total_business,
+        "uniqueConversations": unique_conversations,
+        "avgResponseMinutes": avg_response,
+        "sentiment": sentiment,
+        "intents": intents,
+        "daily": daily,
+    }

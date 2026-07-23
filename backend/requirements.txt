@@ -6,3 +6,5 @@ httpx              # HTTP so'rovlar — Telegram API'ga xabar yuborish uchun
 python-dotenv      # .env faylidan sozlamalarni o'qish
 supabase>=2,<3     # Supabase (Postgres) klienti — kalitlar berilganda ishlaydi
 stripe>=10,<11     # Stripe to'lov platformasi
+openpyxl>=3,<4     # Excel (.xlsx) hisobot export
+python-docx>=1,<2  # Word (.docx) hisobot export

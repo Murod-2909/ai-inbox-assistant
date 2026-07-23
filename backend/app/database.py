@@ -14,7 +14,7 @@ import json
 import os
 import sqlite3
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 DATABASE_PATH = os.getenv("DATABASE_PATH", "inbox.db")
@@ -647,3 +647,100 @@ def list_team() -> list:
 
 def invite_team_member(email: str, full_name: Optional[str]) -> dict:
     raise RuntimeError("Jamoa funksiyasi faqat Supabase ulanganda ishlaydi")
+
+
+# ---------- Hisobotlar (haftalik/oylik export) ----------
+
+def get_report_data(period: str) -> dict:
+    """period: 'week' (7 kun) yoki 'month' (30 kun) — bugunni ham qo'shib hisoblanadi."""
+    days = 7 if period == "week" else 30
+    since_date = (datetime.now(timezone.utc) - timedelta(days=days - 1)).date()
+    since_iso = since_date.isoformat()
+
+    conn = get_connection()
+
+    total_customer = conn.execute(
+        "SELECT COUNT(*) FROM messages WHERE sender='customer' AND sent_at >= ?",
+        (since_iso,),
+    ).fetchone()[0]
+    total_business = conn.execute(
+        "SELECT COUNT(*) FROM messages WHERE sender='business' AND sent_at >= ?",
+        (since_iso,),
+    ).fetchone()[0]
+    unique_conversations = conn.execute(
+        "SELECT COUNT(DISTINCT conversation_id) FROM messages WHERE sent_at >= ?",
+        (since_iso,),
+    ).fetchone()[0]
+
+    sentiment = {"positive": 0, "neutral": 0, "negative": 0}
+    for row in conn.execute(
+        "SELECT a.sentiment, COUNT(*) AS n FROM analyses a"
+        " JOIN messages m ON m.id = a.message_id"
+        " WHERE m.sent_at >= ? GROUP BY a.sentiment",
+        (since_iso,),
+    ).fetchall():
+        sentiment[row["sentiment"]] = row["n"]
+
+    intents = [
+        {"intent": row["intent"], "count": row["n"]}
+        for row in conn.execute(
+            "SELECT a.intent, COUNT(*) AS n FROM analyses a"
+            " JOIN messages m ON m.id = a.message_id"
+            " WHERE m.sent_at >= ? GROUP BY a.intent ORDER BY n DESC",
+            (since_iso,),
+        ).fetchall()
+    ]
+
+    daily_map: dict = {}
+    for row in conn.execute(
+        "SELECT substr(sent_at,1,10) AS day, sender, COUNT(*) AS n FROM messages"
+        " WHERE sent_at >= ? GROUP BY day, sender ORDER BY day",
+        (since_iso,),
+    ).fetchall():
+        entry = daily_map.setdefault(row["day"], {"customerMessages": 0, "businessReplies": 0})
+        if row["sender"] == "customer":
+            entry["customerMessages"] = row["n"]
+        else:
+            entry["businessReplies"] = row["n"]
+
+    pairs = conn.execute(
+        """
+        SELECT m.sent_at AS reply_at,
+               (SELECT MAX(prev.sent_at) FROM messages prev
+                WHERE prev.conversation_id = m.conversation_id
+                  AND prev.sender = 'customer' AND prev.sent_at < m.sent_at) AS asked_at
+        FROM messages m WHERE m.sender = 'business' AND m.sent_at >= ?
+        """,
+        (since_iso,),
+    ).fetchall()
+    diffs = []
+    for row in pairs:
+        if row["asked_at"]:
+            try:
+                reply_time = datetime.fromisoformat(row["reply_at"])
+                asked_time = datetime.fromisoformat(row["asked_at"])
+                diffs.append((reply_time - asked_time).total_seconds() / 60)
+            except ValueError:
+                pass
+    avg_response = round(sum(diffs) / len(diffs), 1) if diffs else None
+
+    conn.close()
+
+    daily = []
+    for i in range(days - 1, -1, -1):
+        d = (datetime.now(timezone.utc) - timedelta(days=i)).date().isoformat()
+        entry = daily_map.get(d, {"customerMessages": 0, "businessReplies": 0})
+        daily.append({"date": d, **entry})
+
+    return {
+        "period": period,
+        "since": since_iso,
+        "until": datetime.now(timezone.utc).date().isoformat(),
+        "totalCustomerMessages": total_customer,
+        "totalBusinessReplies": total_business,
+        "uniqueConversations": unique_conversations,
+        "avgResponseMinutes": avg_response,
+        "sentiment": sentiment,
+        "intents": intents,
+        "daily": daily,
+    }

@@ -19,6 +19,36 @@
   }
 }
 
+.headerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.exportGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.exportButton {
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 8px 12px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+}
+
 .statGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

@@ -12,7 +12,7 @@ load_dotenv()  # .env faylidagi sozlamalarni os.getenv() orqali o'qiladigan qila
 
 import os  # noqa: E402
 from datetime import datetime, time as dtime  # noqa: E402
-from typing import Optional  # noqa: E402
+from typing import Literal, Optional  # noqa: E402
 
 import httpx  # noqa: E402
 from fastapi import FastAPI, HTTPException, Query, Request  # noqa: E402
@@ -21,7 +21,7 @@ from fastapi.responses import Response  # noqa: E402
 
 import stripe  # noqa: E402
 
-from app import ai, meta, telegram  # noqa: E402
+from app import ai, meta, reports, telegram  # noqa: E402
 from app.store import SUPABASE_ENABLED, db as database  # noqa: E402
 from app.schemas import (  # noqa: E402
     AssignRequest,
@@ -284,6 +284,31 @@ def create_note(conversation_id: str, body: NoteRequest) -> dict:
 @app.get("/api/stats")
 def get_stats() -> dict:
     return database.get_stats()
+
+
+# ---------- Hisobotlar (Excel/Word export) ----------
+
+@app.get("/api/reports/export")
+def export_report(
+    period: Literal["week", "month"] = "week",
+    format: Literal["xlsx", "docx"] = "xlsx",  # noqa: A002
+) -> Response:
+    data = database.get_report_data(period)
+    business_name = database.get_business().get("name", "Biznes")
+
+    if format == "xlsx":
+        content = reports.build_xlsx(data, business_name)
+        media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    else:
+        content = reports.build_docx(data, business_name)
+        media_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    filename = f"hisobot-{period}.{format}"
+    return Response(
+        content=content,
+        media_type=media_type,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 # ---------- To'lov (Stripe) ----------

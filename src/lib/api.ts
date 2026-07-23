@@ -143,3 +143,10 @@ export function addNote(
 export function fetchStats(): Promise<Stats | null> {
   return safeFetch<Stats>("/api/stats");
 }
+
+export function reportExportUrl(
+  period: "week" | "month",
+  format: "xlsx" | "docx",
+): string {
+  return `${API_URL}/api/reports/export?period=${period}&format=${format}`;
+}

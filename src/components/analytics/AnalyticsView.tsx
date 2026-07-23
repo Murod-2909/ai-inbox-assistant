@@ -4,8 +4,19 @@
 // backend o'chiq bo'lsa — namunaviy (mock) ko'rsatkichlar.
 import { useEffect, useState } from "react";
 import type { Stats } from "@/lib/types";
-import { fetchStats } from "@/lib/api";
+import { fetchStats, reportExportUrl } from "@/lib/api";
 import styles from "./AnalyticsView.module.scss";
+
+const EXPORT_OPTIONS: {
+  period: "week" | "month";
+  format: "xlsx" | "docx";
+  label: string;
+}[] = [
+  { period: "week", format: "xlsx", label: "Haftalik (Excel)" },
+  { period: "week", format: "docx", label: "Haftalik (Word)" },
+  { period: "month", format: "xlsx", label: "Oylik (Excel)" },
+  { period: "month", format: "docx", label: "Oylik (Word)" },
+];
 
 const INTENT_LABELS: Record<string, string> = {
   question: "Savol",
@@ -104,12 +115,29 @@ export default function AnalyticsView() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1>Tahlil</h1>
-        <p>
-          {isMock
-            ? "Namunaviy ma'lumotlar (backend ulanmagan)"
-            : "Jonli ko'rsatkichlar — bazadagi haqiqiy ma'lumotlardan"}
-        </p>
+        <div className={styles.headerTop}>
+          <div>
+            <h1>Tahlil</h1>
+            <p>
+              {isMock
+                ? "Namunaviy ma'lumotlar (backend ulanmagan)"
+                : "Jonli ko'rsatkichlar — bazadagi haqiqiy ma'lumotlardan"}
+            </p>
+          </div>
+          {!isMock && (
+            <div className={styles.exportGroup}>
+              {EXPORT_OPTIONS.map((opt) => (
+                <a
+                  key={`${opt.period}-${opt.format}`}
+                  className={styles.exportButton}
+                  href={reportExportUrl(opt.period, opt.format)}
+                >
+                  {opt.label}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
       </header>
 
       <div className={styles.statGrid}>
