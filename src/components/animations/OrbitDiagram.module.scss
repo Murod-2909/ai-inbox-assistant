@@ -42,6 +42,7 @@
   background: $color-primary;
   font-size: 30px;
   box-shadow: $shadow-md;
+  color: #fff;
 }
 
 // Har bir kanal shu "uyacha"da joylashadi: markazdan berilgan burchak
@@ -78,7 +79,16 @@
 }
 
 .itemIcon {
-  font-size: 24px;
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
 }
 
 .itemLabel {
@@ -129,6 +139,9 @@
   }
 
   .itemIcon {
-    font-size: 20px;
+    width: 30px;
+    height: 30px;
   }
 }
+
+// (SVG ichki o'lchami .itemIcon width/height'ni meros oladi — mobil uchun ham)

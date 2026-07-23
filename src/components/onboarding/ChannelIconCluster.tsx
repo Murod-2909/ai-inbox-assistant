@@ -2,15 +2,20 @@
 
 import { motion } from "framer-motion";
 import { TiltCard } from "@/components/animations/TiltCard";
+import {
+  TelegramIcon,
+  WhatsAppIcon,
+  InstagramIcon,
+} from "@/components/icons/BrandIcons";
 import styles from "./ChannelIconCluster.module.scss";
 
 // Faqat haqiqiy (yoki tez orada qo'shiladigan) kanallar — boshqa
 // hech qanday xizmat bilan integratsiya yo'q, shuning uchun soxta
 // belgilar (TikTok, Viber va h.k.) qo'shilmadi.
 const CHANNELS = [
-  { icon: "✈️", label: "Telegram", x: 50, y: 50, size: 64, big: true },
-  { icon: "💚", label: "WhatsApp", x: 22, y: 26, size: 50 },
-  { icon: "📸", label: "Instagram", x: 74, y: 30, size: 46 },
+  { icon: <TelegramIcon />, label: "Telegram", x: 50, y: 50, size: 64, big: true },
+  { icon: <WhatsAppIcon />, label: "WhatsApp", x: 22, y: 26, size: 50 },
+  { icon: <InstagramIcon />, label: "Instagram", x: 74, y: 30, size: 46 },
   { icon: "➕", label: "Tez orada", x: 50, y: 82, size: 40, faded: true },
 ];
 

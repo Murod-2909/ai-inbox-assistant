@@ -1,6 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import {
+  TelegramIcon,
+  FacebookIcon,
+  InstagramIcon,
+  WhatsAppIcon,
+} from "@/components/icons/BrandIcons";
+import { SetupSteps } from "./SetupSteps";
 import styles from "./ChannelsView.module.scss";
 
 type ConnectionStatus = "disconnected" | "connecting" | "connected";
@@ -49,7 +56,7 @@ export default function ChannelsView() {
         {/* Telegram — birinchi bosqich */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <span className={`${styles.channelIcon} ${styles.telegram}`}>✈️</span>
+            <TelegramIcon className={styles.channelIcon} />
             <div>
               <h3>Telegram</h3>
               <span
@@ -68,15 +75,28 @@ export default function ChannelsView() {
 
           {status !== "connected" ? (
             <>
-              <ol className={styles.steps}>
-                <li>
-                  Telegram&apos;da <strong>@BotFather</strong> ga yozing
-                </li>
-                <li>
-                  <code>/newbot</code> buyrug&apos;i bilan yangi bot yarating
-                </li>
-                <li>Berilgan bot tokenini quyiga joylashtiring</li>
-              </ol>
+              <SetupSteps
+                steps={[
+                  {
+                    icon: "🔍",
+                    text: (
+                      <>
+                        Telegram&apos;da <strong>@BotFather</strong> ga yozing
+                      </>
+                    ),
+                  },
+                  {
+                    icon: "⌨️",
+                    text: (
+                      <>
+                        <code>/newbot</code> buyrug&apos;i bilan yangi bot
+                        yarating
+                      </>
+                    ),
+                  },
+                  { icon: "🔑", text: "Berilgan bot tokenini quyiga joylashtiring" },
+                ]}
+              />
               <div className={styles.form}>
                 <input
                   type="text"
@@ -103,7 +123,7 @@ export default function ChannelsView() {
         {/* Facebook — asosiy ulanish shu yerda amalga oshiriladi */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <span className={`${styles.channelIcon} ${styles.facebook}`}>📘</span>
+            <FacebookIcon className={styles.channelIcon} />
             <div>
               <h3>Facebook Messenger</h3>
               <span className={`${styles.status} ${metaStatus === "connected" ? styles.statusOn : ""}`}>
@@ -114,13 +134,21 @@ export default function ChannelsView() {
 
           {metaStatus !== "connected" ? (
             <>
-              <ol className={styles.steps}>
-                <li>
-                  <strong>developers.facebook.com</strong>&apos;da App yarating
-                </li>
-                <li>Facebook Page&apos;ingizni ulang</li>
-                <li>Page Access Token&apos;ni quyiga joylashtiring</li>
-              </ol>
+              <SetupSteps
+                steps={[
+                  {
+                    icon: "➕",
+                    text: (
+                      <>
+                        <strong>developers.facebook.com</strong>&apos;da App
+                        yarating
+                      </>
+                    ),
+                  },
+                  { icon: "🔗", text: "Facebook Page'ingizni ulang" },
+                  { icon: "🔑", text: "Page Access Token'ni quyiga joylashtiring" },
+                ]}
+              />
               <div className={styles.form}>
                 <input
                   type="text"
@@ -150,7 +178,7 @@ export default function ChannelsView() {
         {/* Instagram — Facebook bilan bir xil token, alohida ulanish shart emas */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <span className={`${styles.channelIcon} ${styles.instagram}`}>📸</span>
+            <InstagramIcon className={styles.channelIcon} />
             <div>
               <h3>Instagram</h3>
               <span className={`${styles.status} ${metaStatus === "connected" ? styles.statusOn : ""}`}>
@@ -177,7 +205,7 @@ export default function ChannelsView() {
         {/* Keyingi bosqichlar */}
         <div className={`${styles.card} ${styles.disabled}`}>
           <div className={styles.cardHeader}>
-            <span className={`${styles.channelIcon} ${styles.whatsapp}`}>💚</span>
+            <WhatsAppIcon className={styles.channelIcon} />
             <div>
               <h3>WhatsApp</h3>
               <span className={styles.status}>Tez orada</span>

@@ -20,6 +20,12 @@
   border-radius: 50%;
   background: $color-surface;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+
+  svg {
+    width: 68%;
+    height: 68%;
+    display: block;
+  }
 }
 
 .bubbleFaded {

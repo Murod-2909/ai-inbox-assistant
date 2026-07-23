@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import styles from "./OrbitDiagram.module.scss";
 
 interface OrbitItem {
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   status: string;
   active?: boolean;
@@ -12,7 +12,7 @@ interface OrbitItem {
 }
 
 interface OrbitDiagramProps {
-  centerIcon: string;
+  centerIcon: React.ReactNode;
   items: OrbitItem[];
 }
 

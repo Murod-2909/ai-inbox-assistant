@@ -16,6 +16,11 @@ import { TiltCard } from "@/components/animations/TiltCard";
 import { MessageParticles } from "@/components/animations/MessageParticles";
 import { OrbitDiagram } from "@/components/animations/OrbitDiagram";
 import { IndustryShowcase } from "@/components/animations/IndustryShowcase";
+import {
+  TelegramIcon,
+  WhatsAppIcon,
+  InstagramIcon,
+} from "@/components/icons/BrandIcons";
 import styles from "./landing.module.scss";
 
 const FEATURES = [
@@ -101,9 +106,9 @@ const INDUSTRIES = [
 ];
 
 const CHANNELS = [
-  { icon: "✈️", label: "Telegram", status: "Faol", active: true, angle: 0 },
-  { icon: "💚", label: "WhatsApp", status: "Tez orada", angle: 120 },
-  { icon: "📸", label: "Instagram", status: "Tez orada", angle: 240 },
+  { icon: <TelegramIcon />, label: "Telegram", status: "Faol", active: true, angle: 0 },
+  { icon: <WhatsAppIcon />, label: "WhatsApp", status: "Tez orada", angle: 120 },
+  { icon: <InstagramIcon />, label: "Instagram", status: "Tez orada", angle: 240 },
 ];
 
 const PLANS = [

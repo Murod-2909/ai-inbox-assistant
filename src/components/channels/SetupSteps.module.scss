@@ -1,0 +1,67 @@
+@use "@/styles/variables" as *;
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-bottom: 16px;
+
+  // Raqamlarni bog'lovchi vertikal chiziq (oxirgi qadamda yo'q)
+  &:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: 22px;
+    left: 10px;
+    width: 1px;
+    height: calc(100% - 14px);
+    background: $color-border;
+  }
+}
+
+.stepNum {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: $color-primary-soft;
+  color: $color-primary;
+  font-size: 11px;
+  font-weight: 700;
+  z-index: 1;
+}
+
+.stepIcon {
+  flex-shrink: 0;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.stepText {
+  font-size: 13px;
+  color: $color-text-muted;
+  line-height: 1.4;
+  padding-top: 1px;
+
+  strong,
+  code {
+    color: $color-text;
+  }
+
+  code {
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 12px;
+  }
+}
