@@ -10,6 +10,10 @@ export default function ChannelsView() {
   const [status, setStatus] = useState<ConnectionStatus>("disconnected");
 
   const [pageToken, setPageToken] = useState("");
+  // Facebook va Instagram bitta Page Access Token bilan ishlaydi (Instagram
+  // Business akkaunt doim Facebook Page'ga ulangan bo'ladi) — shuning uchun
+  // bitta umumiy holat, lekin foydalanuvchiga tushunarli bo'lishi uchun
+  // ikkita alohida karta sifatida ko'rsatamiz.
   const [metaStatus, setMetaStatus] = useState<ConnectionStatus>("disconnected");
 
   // Hozircha faqat UI — backend tayyor bo'lgach haqiqiy ulanish qo'shiladi
@@ -19,7 +23,6 @@ export default function ChannelsView() {
     setTimeout(() => setStatus("connected"), 1200);
   }
 
-  // Facebook Page + unga ulangan Instagram — bitta token ikkalasini ham yoqadi.
   // Haqiqiy ulanish backend/.env dagi FACEBOOK_PAGE_ACCESS_TOKEN orqali
   // (docs/meta-setup.md), bu yerda — Telegram kartasidagidek — demo ko'rinish.
   function handleMetaConnect() {
@@ -27,6 +30,13 @@ export default function ChannelsView() {
     setMetaStatus("connecting");
     setTimeout(() => setMetaStatus("connected"), 1200);
   }
+
+  const metaStatusLabel =
+    metaStatus === "connected"
+      ? "Ulangan"
+      : metaStatus === "connecting"
+        ? "Ulanmoqda..."
+        : "Ulanmagan";
 
   return (
     <div className={styles.page}>
@@ -90,22 +100,14 @@ export default function ChannelsView() {
           )}
         </div>
 
-        {/* Facebook + Instagram — bitta Meta Page token ikkalasini ham yoqadi */}
+        {/* Facebook — asosiy ulanish shu yerda amalga oshiriladi */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <span className={`${styles.channelIcon} ${styles.meta}`}>📘</span>
+            <span className={`${styles.channelIcon} ${styles.facebook}`}>📘</span>
             <div>
-              <h3>Facebook va Instagram</h3>
-              <span
-                className={`${styles.status} ${
-                  metaStatus === "connected" ? styles.statusOn : ""
-                }`}
-              >
-                {metaStatus === "connected"
-                  ? "Ulangan"
-                  : metaStatus === "connecting"
-                    ? "Ulanmoqda..."
-                    : "Ulanmagan"}
+              <h3>Facebook Messenger</h3>
+              <span className={`${styles.status} ${metaStatus === "connected" ? styles.statusOn : ""}`}>
+                {metaStatusLabel}
               </span>
             </div>
           </div>
@@ -116,7 +118,7 @@ export default function ChannelsView() {
                 <li>
                   <strong>developers.facebook.com</strong>&apos;da App yarating
                 </li>
-                <li>Facebook Page&apos;ingizni ulang (Instagram shu Page&apos;ga bog&apos;langan bo&apos;lsin)</li>
+                <li>Facebook Page&apos;ingizni ulang</li>
                 <li>Page Access Token&apos;ni quyiga joylashtiring</li>
               </ol>
               <div className={styles.form}>
@@ -134,15 +136,41 @@ export default function ChannelsView() {
                 </button>
               </div>
               <p className={styles.hint}>
-                Batafsil qo&apos;llanma:{" "}
-                <code>docs/meta-setup.md</code>
+                Batafsil qo&apos;llanma: <code>docs/meta-setup.md</code>
               </p>
             </>
           ) : (
             <div className={styles.connectedBox}>
-              ✅ Facebook va Instagram ulandi. Ikkala kanaldan kelgan xabarlar{" "}
+              ✅ Facebook Page ulandi. Messenger xabarlari{" "}
               <strong>Xabarlar</strong> bo&apos;limiga tusha boshlaydi.
             </div>
+          )}
+        </div>
+
+        {/* Instagram — Facebook bilan bir xil token, alohida ulanish shart emas */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={`${styles.channelIcon} ${styles.instagram}`}>📸</span>
+            <div>
+              <h3>Instagram</h3>
+              <span className={`${styles.status} ${metaStatus === "connected" ? styles.statusOn : ""}`}>
+                {metaStatusLabel}
+              </span>
+            </div>
+          </div>
+
+          {metaStatus === "connected" ? (
+            <div className={styles.connectedBox}>
+              ✅ Instagram Facebook Page orqali avtomatik ulandi. DM xabarlari{" "}
+              <strong>Xabarlar</strong> bo&apos;limiga tusha boshlaydi.
+            </div>
+          ) : (
+            <p className={styles.soon}>
+              Instagram Business akkaunt doim Facebook Page&apos;ga ulangan
+              bo&apos;ladi — shuning uchun alohida ulanish shart emas.{" "}
+              <strong>Facebook Messenger</strong> kartasida ulang, Instagram
+              ham avtomatik yoqiladi.
+            </p>
           )}
         </div>
 
