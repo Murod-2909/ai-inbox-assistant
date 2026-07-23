@@ -63,3 +63,12 @@ class NoteRequest(BaseModel):
     """Suhbatga ichki eslatma qo'shish."""
     text: str = Field(min_length=1, max_length=2000)
     author: str = "Operator"  # Auth qo'shilgach haqiqiy operator ismi bo'ladi
+
+
+class AssignRequest(BaseModel):
+    """Suhbatni operatorga tayinlash. operatorId=None — tayinlashni bekor qiladi.
+
+    Backend endpointlar hozircha JWT tekshirmaydi (service_role bilan ishlaydi),
+    shuning uchun operator ID'ni frontend Supabase sessiyasidan o'zi yuboradi.
+    """
+    operatorId: Optional[str] = None

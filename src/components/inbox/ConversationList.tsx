@@ -16,18 +16,34 @@ function formatTime(iso: string): string {
   });
 }
 
+export type InboxFilter = "all" | "mine" | "unassigned";
+
 interface Props {
   conversations: Conversation[];
   selectedId: string;
   flashId: string | null;
   onSelect: (id: string) => void;
+  filter: InboxFilter;
+  onFilterChange: (filter: InboxFilter) => void;
+  filterCounts: Record<InboxFilter, number>;
+  showFilters: boolean;
 }
+
+const FILTER_TABS: { key: InboxFilter; label: string }[] = [
+  { key: "all", label: "Barchasi" },
+  { key: "mine", label: "Mening" },
+  { key: "unassigned", label: "Tayinlanmagan" },
+];
 
 export default function ConversationList({
   conversations,
   selectedId,
   flashId,
   onSelect,
+  filter,
+  onFilterChange,
+  filterCounts,
+  showFilters,
 }: Props) {
   return (
     <div className={styles.list}>
@@ -35,6 +51,23 @@ export default function ConversationList({
         <h2>Xabarlar</h2>
         <span className={styles.count}>{conversations.length}</span>
       </div>
+
+      {showFilters && (
+        <div className={styles.filters}>
+          {FILTER_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              className={`${styles.filterTab} ${
+                filter === tab.key ? styles.filterTabActive : ""
+              }`}
+              onClick={() => onFilterChange(tab.key)}
+            >
+              {tab.label}
+              <span className={styles.filterCount}>{filterCounts[tab.key]}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className={styles.items}>
         {conversations.map((conv) => (
@@ -69,6 +102,16 @@ export default function ConversationList({
             </div>
           </button>
         ))}
+
+        {conversations.length === 0 && (
+          <p className={styles.filterEmpty}>
+            {filter === "mine"
+              ? "Sizga tayinlangan suhbat yo'q"
+              : filter === "unassigned"
+                ? "Tayinlanmagan suhbat yo'q"
+                : "Suhbat yo'q"}
+          </p>
+        )}
       </div>
     </div>
   );

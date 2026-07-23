@@ -16,6 +16,10 @@ create table if not exists businesses (
     id uuid primary key default gen_random_uuid(),
     name text not null,
     telegram_bot_token text,          -- shifrlangan saqlash uchun Vault ham ko'rib chiqilsin
+    -- Facebook Page + unga ulangan Instagram Business akkaunt BITTA token bilan
+    -- ishlaydi (Meta App tayyor bo'lgach, docs/meta-setup.md'ga qarang)
+    facebook_page_id text,
+    facebook_page_token text,
     working_hours jsonb,              -- ish vaqti (avto-javob uchun), masalan {"mon": ["09:00","18:00"]}
     created_at timestamptz not null default now()
 );
@@ -34,11 +38,14 @@ create table if not exists customers (
     id uuid primary key default gen_random_uuid(),
     business_id uuid not null references businesses (id) on delete cascade,
     name text not null,
-    channel text not null default 'telegram' check (channel in ('telegram', 'whatsapp', 'instagram')),
+    channel text not null default 'telegram' check (channel in ('telegram', 'whatsapp', 'instagram', 'facebook')),
     username text,
     telegram_chat_id bigint,
+    -- Facebook/Instagram foydalanuvchi ID'si (PSID/IGSID) — matn, Telegram'nikidan farqli
+    platform_user_id text,
     created_at timestamptz not null default now(),
-    unique (business_id, telegram_chat_id)
+    unique (business_id, telegram_chat_id),
+    unique (business_id, platform_user_id)
 );
 
 create table if not exists conversations (
@@ -221,7 +228,8 @@ with (security_invoker = on) as
 select
     c.id, c.business_id, c.last_message, c.last_message_at, c.unread_count,
     cu.id  as customer_id, cu.name, cu.channel, cu.username,
-    a.sentiment, a.intent, a.suggested_reply
+    a.sentiment, a.intent, a.suggested_reply,
+    c.assigned_operator_id
 from conversations c
 join customers cu on cu.id = c.customer_id
 left join lateral (

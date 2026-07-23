@@ -87,6 +87,8 @@ interface Props {
   messages: Message[];
   onBack: () => void;
   onSend: (text: string) => Promise<void> | void;
+  currentOperatorId: string | null;
+  onAssignToggle: () => void;
 }
 
 export default function MessagePanel({
@@ -94,6 +96,8 @@ export default function MessagePanel({
   messages,
   onBack,
   onSend,
+  currentOperatorId,
+  onAssignToggle,
 }: Props) {
   const { customer, analysis } = conversation;
   const [draft, setDraft] = useState("");
@@ -186,6 +190,22 @@ export default function MessagePanel({
                 {intentLabels[analysis.intent]}
               </span>
             </>
+          )}
+          {currentOperatorId && (
+            <button
+              className={`${styles.assignButton} ${
+                conversation.assignedOperatorId === currentOperatorId
+                  ? styles.assignButtonActive
+                  : ""
+              }`}
+              onClick={onAssignToggle}
+            >
+              {conversation.assignedOperatorId === currentOperatorId
+                ? "✓ Menga tayinlangan"
+                : conversation.assignedOperatorId
+                  ? "Boshqa operatorga tayinlangan"
+                  : "Menga tayinlash"}
+            </button>
           )}
           <button
             className={`${styles.iconButton} ${showNotes ? styles.iconButtonActive : ""}`}

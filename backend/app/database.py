@@ -47,7 +47,10 @@ def init_db() -> None:
             name TEXT NOT NULL,
             channel TEXT NOT NULL DEFAULT 'telegram',
             username TEXT,
-            telegram_chat_id INTEGER UNIQUE
+            telegram_chat_id INTEGER UNIQUE,
+            -- Facebook/Instagram foydalanuvchi ID'si (PSID/IGSID) — Telegram'dan
+            -- farqli, matn sifatida keladi, shuning uchun alohida ustun
+            platform_user_id TEXT UNIQUE
         );
 
         CREATE TABLE IF NOT EXISTS conversations (
@@ -55,7 +58,8 @@ def init_db() -> None:
             customer_id TEXT NOT NULL REFERENCES customers(id),
             last_message TEXT NOT NULL DEFAULT '',
             last_message_at TEXT NOT NULL,
-            unread_count INTEGER NOT NULL DEFAULT 0
+            unread_count INTEGER NOT NULL DEFAULT 0,
+            assigned_operator_id TEXT
         );
 
         -- kind: text | photo | voice | video | sticker
@@ -227,6 +231,7 @@ def list_conversations() -> list:
     rows = conn.execute(
         """
         SELECT c.id, c.last_message, c.last_message_at, c.unread_count,
+               c.assigned_operator_id,
                cu.id AS customer_id, cu.name, cu.channel, cu.username,
                a.sentiment, a.intent, a.suggested_reply
         FROM conversations c
@@ -317,6 +322,43 @@ def find_or_create_customer(telegram_chat_id: int, name: str, username: Optional
     return {"customer_id": customer_id, "conversation_id": conversation_id}
 
 
+def find_or_create_meta_customer(
+    channel: str, platform_user_id: str, name: str, username: Optional[str]
+) -> dict:
+    """Facebook/Instagram'dan kelgan mijozni topadi, bo'lmasa yangi yaratadi.
+
+    find_or_create_customer'ning Meta uchun varianti — Telegram funksiyasi
+    o'zgarishsiz qoladi (mavjud botlarni buzmaslik uchun).
+    """
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT cu.id AS customer_id, c.id AS conversation_id"
+        " FROM customers cu JOIN conversations c ON c.customer_id = cu.id"
+        " WHERE cu.platform_user_id = ?",
+        (platform_user_id,),
+    ).fetchone()
+
+    if row:
+        conn.close()
+        return dict(row)
+
+    customer_id = new_id()
+    conversation_id = new_id()
+    conn.execute(
+        "INSERT INTO customers (id, name, channel, username, platform_user_id)"
+        " VALUES (?, ?, ?, ?, ?)",
+        (customer_id, name, channel, username, platform_user_id),
+    )
+    conn.execute(
+        "INSERT INTO conversations (id, customer_id, last_message, last_message_at, unread_count)"
+        " VALUES (?, ?, '', ?, 0)",
+        (conversation_id, customer_id, now_iso()),
+    )
+    conn.commit()
+    conn.close()
+    return {"customer_id": customer_id, "conversation_id": conversation_id}
+
+
 def add_message(
     conversation_id: str,
     sender: str,
@@ -375,6 +417,17 @@ def mark_read(conversation_id: str) -> None:
     """Operator suhbatni ochganda unread sonini 0 ga tushiradi."""
     conn = get_connection()
     conn.execute("UPDATE conversations SET unread_count = 0 WHERE id = ?", (conversation_id,))
+    conn.commit()
+    conn.close()
+
+
+def assign_conversation(conversation_id: str, operator_id: Optional[str]) -> None:
+    """Suhbatni operatorga tayinlaydi (operator_id=None — tayinlashni bekor qiladi)."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE conversations SET assigned_operator_id = ? WHERE id = ?",
+        (operator_id, conversation_id),
+    )
     conn.commit()
     conn.close()
 
@@ -516,3 +569,20 @@ def get_telegram_chat_id(conversation_id: str) -> Optional[int]:
     ).fetchone()
     conn.close()
     return row["telegram_chat_id"] if row else None
+
+
+def get_customer_channel_info(conversation_id: str) -> Optional[dict]:
+    """Javob yuborish uchun kanal turi va shu kanaldagi mijoz ID'sini topadi.
+
+    /api/conversations/{id}/reply shu funksiya orqali qaysi platformaga
+    (Telegram/Facebook/Instagram) yuborishni aniqlaydi.
+    """
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT cu.channel, cu.telegram_chat_id, cu.platform_user_id"
+        " FROM conversations c JOIN customers cu ON cu.id = c.customer_id"
+        " WHERE c.id = ?",
+        (conversation_id,),
+    ).fetchone()
+    conn.close()
+    return dict(row) if row else None

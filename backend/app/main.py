@@ -13,15 +13,15 @@ load_dotenv()  # .env faylidagi sozlamalarni os.getenv() orqali o'qiladigan qila
 import os  # noqa: E402
 
 import httpx  # noqa: E402
-from fastapi import FastAPI, HTTPException  # noqa: E402
+from fastapi import FastAPI, HTTPException, Query  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import Response  # noqa: E402
 
 import stripe  # noqa: E402
 
-from app import ai, telegram  # noqa: E402
+from app import ai, meta, telegram  # noqa: E402
 from app.store import SUPABASE_ENABLED, db as database  # noqa: E402
-from app.schemas import NoteRequest, ReplyRequest, TemplateRequest  # noqa: E402
+from app.schemas import AssignRequest, NoteRequest, ReplyRequest, TemplateRequest  # noqa: E402
 
 # Stripe setup
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
@@ -64,6 +64,7 @@ def _row_to_conversation(row: dict) -> dict:
         "lastMessage": row["last_message"],
         "lastMessageAt": row["last_message_at"],
         "unreadCount": row["unread_count"],
+        "assignedOperatorId": row.get("assigned_operator_id"),
         "analysis": None,
     }
     if row.get("sentiment"):
@@ -142,17 +143,30 @@ def read_conversation(conversation_id: str) -> dict:
     return {"ok": True}
 
 
+@app.post("/api/conversations/{conversation_id}/assign")
+def assign_conversation(conversation_id: str, body: AssignRequest) -> dict:
+    """Suhbatni operatorga tayinlaydi/bekor qiladi ("Mening"/"Tayinlanmagan" filtri uchun)."""
+    database.assign_conversation(conversation_id, body.operatorId)
+    return {"ok": True}
+
+
 @app.post("/api/conversations/{conversation_id}/reply")
 def reply(conversation_id: str, body: ReplyRequest) -> dict:
-    """Operator javobi: bazaga yozamiz va (token bo'lsa) Telegram'ga yuboramiz."""
+    """Operator javobi: bazaga yozamiz va mos platformaga (Telegram/Facebook/
+    Instagram) yuboramiz — qaysi biriga yuborishni mijozning kanali aniqlaydi."""
     messages = database.list_messages(conversation_id)
     if not messages:
         raise HTTPException(status_code=404, detail="Suhbat topilmadi")
 
     saved = database.add_message(conversation_id, "business", body.text)
 
-    chat_id = database.get_telegram_chat_id(conversation_id)
-    delivered = telegram.send_message(chat_id, body.text) if chat_id else False
+    channel_info = database.get_customer_channel_info(conversation_id)
+    delivered = False
+    if channel_info:
+        if channel_info.get("channel") == "telegram" and channel_info.get("telegram_chat_id"):
+            delivered = telegram.send_message(channel_info["telegram_chat_id"], body.text)
+        elif channel_info.get("channel") in ("facebook", "instagram") and channel_info.get("platform_user_id"):
+            delivered = meta.send_message(channel_info["platform_user_id"], body.text)
 
     return {
         "id": saved["id"],
@@ -304,5 +318,38 @@ def telegram_webhook(update: dict) -> dict:
     ai_text = parsed["ai_text"] or transcript
     if ai_text:
         ai.analyze_message(message["id"], ids["conversation_id"], ai_text)
+
+    return {"ok": True}
+
+
+# ---------- Meta webhook (Facebook Messenger + Instagram DM) ----------
+# Ikkalasi ham bitta Meta App + bitta webhook URL orqali ishlaydi.
+
+@app.get("/webhook/meta")
+def meta_webhook_verify(
+    hub_mode: str = Query(None, alias="hub.mode"),
+    hub_verify_token: str = Query(None, alias="hub.verify_token"),
+    hub_challenge: str = Query(None, alias="hub.challenge"),
+) -> Response:
+    """Meta App sozlamalarida webhook ro'yxatdan o'tkazilganda chaqiriladi."""
+    challenge = meta.verify_webhook(hub_mode, hub_verify_token, hub_challenge)
+    if challenge is None:
+        raise HTTPException(status_code=403, detail="Verify token mos kelmadi")
+    return Response(content=challenge, media_type="text/plain")
+
+
+@app.post("/webhook/meta")
+def meta_webhook(update: dict) -> dict:
+    """Facebook Messenger yoki Instagram'dan yangi xabar keldi."""
+    events = meta.parse_webhook_event(update)
+    for event in events:
+        ids = database.find_or_create_meta_customer(
+            channel=event["platform"],
+            platform_user_id=event["sender_id"],
+            name=f"{event['platform'].capitalize()} foydalanuvchi",
+            username=None,
+        )
+        message = database.add_message(ids["conversation_id"], "customer", event["text"])
+        ai.analyze_message(message["id"], ids["conversation_id"], event["text"])
 
     return {"ok": True}

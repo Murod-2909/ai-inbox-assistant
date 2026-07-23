@@ -57,6 +57,17 @@ export function markRead(conversationId: string): void {
   void safeFetch(`/api/conversations/${conversationId}/read`, { method: "POST" });
 }
 
+export function assignConversation(
+  conversationId: string,
+  operatorId: string | null,
+): Promise<{ ok: boolean } | null> {
+  return safeFetch(`/api/conversations/${conversationId}/assign`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ operatorId }),
+  });
+}
+
 export function fetchTemplates(): Promise<ReplyTemplate[] | null> {
   return safeFetch<ReplyTemplate[]>("/api/templates");
 }

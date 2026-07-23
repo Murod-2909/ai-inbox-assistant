@@ -130,6 +130,20 @@ def get_telegram_chat_id(conversation_id: str) -> Optional[int]:
     return None
 
 
+def get_customer_channel_info(conversation_id: str) -> Optional[dict]:
+    """Javob yuborish uchun kanal turi va shu kanaldagi mijoz ID'sini topadi."""
+    rows = (
+        _sb().table("conversations")
+        .select("customers(channel, telegram_chat_id, platform_user_id)")
+        .eq("id", conversation_id)
+        .execute()
+        .data
+    )
+    if rows and rows[0].get("customers"):
+        return rows[0]["customers"]
+    return None
+
+
 # ---------- Yozish ----------
 
 def find_or_create_customer(telegram_chat_id: int, name: str, username: Optional[str]) -> dict:
@@ -156,6 +170,52 @@ def find_or_create_customer(telegram_chat_id: int, name: str, username: Optional
             "channel": "telegram",
             "username": username,
             "telegram_chat_id": telegram_chat_id,
+        })
+        .execute()
+        .data[0]
+    )
+    conversation = (
+        sb.table("conversations")
+        .insert({
+            "business_id": _biz(),
+            "customer_id": customer["id"],
+            "last_message": "",
+            "last_message_at": now_iso(),
+            "unread_count": 0,
+        })
+        .execute()
+        .data[0]
+    )
+    return {"customer_id": customer["id"], "conversation_id": conversation["id"]}
+
+
+def find_or_create_meta_customer(
+    channel: str, platform_user_id: str, name: str, username: Optional[str]
+) -> dict:
+    """Facebook/Instagram'dan kelgan mijozni topadi, bo'lmasa yangi yaratadi."""
+    sb = _sb()
+    existing = (
+        sb.table("customers")
+        .select("id, conversations(id)")
+        .eq("platform_user_id", platform_user_id)
+        .eq("business_id", _biz())
+        .execute()
+        .data
+    )
+    if existing and existing[0].get("conversations"):
+        return {
+            "customer_id": existing[0]["id"],
+            "conversation_id": existing[0]["conversations"][0]["id"],
+        }
+
+    customer = (
+        sb.table("customers")
+        .insert({
+            "business_id": _biz(),
+            "name": name,
+            "channel": channel,
+            "username": username,
+            "platform_user_id": platform_user_id,
         })
         .execute()
         .data[0]
@@ -231,6 +291,13 @@ def save_analysis(message_id: str, conversation_id: str, analysis: dict, source:
 
 def mark_read(conversation_id: str) -> None:
     _sb().table("conversations").update({"unread_count": 0}).eq("id", conversation_id).execute()
+
+
+def assign_conversation(conversation_id: str, operator_id: Optional[str]) -> None:
+    """Suhbatni operatorga tayinlaydi (operator_id=None — tayinlashni bekor qiladi)."""
+    _sb().table("conversations").update(
+        {"assigned_operator_id": operator_id}
+    ).eq("id", conversation_id).execute()
 
 
 # ---------- Shablonlar ----------

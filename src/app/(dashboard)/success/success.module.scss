@@ -16,6 +16,19 @@
   max-width: 600px;
   text-align: center;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: $color-text;
+  }
+
+  > p {
+    font-size: 16px;
+    color: $color-text-muted;
+    margin-bottom: 40px;
+  }
 }
 
 .icon {
@@ -30,19 +43,6 @@
   color: $color-success;
   margin-bottom: 24px;
   font-weight: 700;
-}
-
-h1 {
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: $color-text;
-}
-
-> p {
-  font-size: 16px;
-  color: $color-text-muted;
-  margin-bottom: 40px;
 }
 
 .details {
@@ -144,16 +144,16 @@ h1 {
 @media (max-width: $breakpoint-mobile) {
   .container {
     padding: 40px 24px;
+
+    h1 {
+      font-size: 24px;
+    }
   }
 
   .icon {
     width: 60px;
     height: 60px;
     font-size: 32px;
-  }
-
-  h1 {
-    font-size: 24px;
   }
 
   .details {

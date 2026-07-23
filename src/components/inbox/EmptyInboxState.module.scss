@@ -1,0 +1,72 @@
+@use "@/styles/variables" as *;
+
+.wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  p {
+    font-size: 13px;
+    color: $color-text-muted;
+    line-height: 1.6;
+    max-width: 260px;
+    margin-bottom: 18px;
+  }
+}
+
+.bubbleStack {
+  position: relative;
+  width: 96px;
+  height: 78px;
+  margin-bottom: 20px;
+}
+
+.bubbleBack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 68px;
+  height: 48px;
+  border-radius: $radius-lg;
+  background: $color-primary-soft;
+  border: 1px solid $color-border;
+}
+
+.bubbleFront {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: $radius-lg;
+  background: $color-primary;
+  font-size: 24px;
+  box-shadow: $shadow-md;
+}
+
+.cta {
+  display: inline-block;
+  background: $color-primary;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: $radius-md;
+  padding: 9px 20px;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}

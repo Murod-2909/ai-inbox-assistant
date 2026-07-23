@@ -66,6 +66,10 @@
   &.instagram {
     background: rgba(225, 48, 108, 0.12);
   }
+
+  &.meta {
+    background: rgba(24, 119, 242, 0.12);
+  }
 }
 
 .status {
@@ -142,4 +146,18 @@
   font-size: 13px;
   color: $color-text-muted;
   line-height: 1.5;
+}
+
+.hint {
+  font-size: 12px;
+  color: $color-text-muted;
+  margin-top: 8px;
+
+  code {
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: var(--font-geist-mono), monospace;
+  }
 }

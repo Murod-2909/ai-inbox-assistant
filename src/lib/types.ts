@@ -43,6 +43,7 @@ export interface Conversation {
   lastMessage: string;
   lastMessageAt: string; // ISO
   unreadCount: number;
+  assignedOperatorId?: string | null;
   analysis?: AiAnalysis;
 }
 

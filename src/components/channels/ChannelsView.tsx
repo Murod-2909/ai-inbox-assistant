@@ -9,11 +9,23 @@ export default function ChannelsView() {
   const [botToken, setBotToken] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("disconnected");
 
+  const [pageToken, setPageToken] = useState("");
+  const [metaStatus, setMetaStatus] = useState<ConnectionStatus>("disconnected");
+
   // Hozircha faqat UI — backend tayyor bo'lgach haqiqiy ulanish qo'shiladi
   function handleConnect() {
     if (!botToken.trim()) return;
     setStatus("connecting");
     setTimeout(() => setStatus("connected"), 1200);
+  }
+
+  // Facebook Page + unga ulangan Instagram — bitta token ikkalasini ham yoqadi.
+  // Haqiqiy ulanish backend/.env dagi FACEBOOK_PAGE_ACCESS_TOKEN orqali
+  // (docs/meta-setup.md), bu yerda — Telegram kartasidagidek — demo ko'rinish.
+  function handleMetaConnect() {
+    if (!pageToken.trim()) return;
+    setMetaStatus("connecting");
+    setTimeout(() => setMetaStatus("connected"), 1200);
   }
 
   return (
@@ -78,6 +90,62 @@ export default function ChannelsView() {
           )}
         </div>
 
+        {/* Facebook + Instagram — bitta Meta Page token ikkalasini ham yoqadi */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={`${styles.channelIcon} ${styles.meta}`}>📘</span>
+            <div>
+              <h3>Facebook va Instagram</h3>
+              <span
+                className={`${styles.status} ${
+                  metaStatus === "connected" ? styles.statusOn : ""
+                }`}
+              >
+                {metaStatus === "connected"
+                  ? "Ulangan"
+                  : metaStatus === "connecting"
+                    ? "Ulanmoqda..."
+                    : "Ulanmagan"}
+              </span>
+            </div>
+          </div>
+
+          {metaStatus !== "connected" ? (
+            <>
+              <ol className={styles.steps}>
+                <li>
+                  <strong>developers.facebook.com</strong>&apos;da App yarating
+                </li>
+                <li>Facebook Page&apos;ingizni ulang (Instagram shu Page&apos;ga bog&apos;langan bo&apos;lsin)</li>
+                <li>Page Access Token&apos;ni quyiga joylashtiring</li>
+              </ol>
+              <div className={styles.form}>
+                <input
+                  type="text"
+                  placeholder="Page Access Token"
+                  value={pageToken}
+                  onChange={(e) => setPageToken(e.target.value)}
+                />
+                <button
+                  onClick={handleMetaConnect}
+                  disabled={!pageToken.trim() || metaStatus === "connecting"}
+                >
+                  {metaStatus === "connecting" ? "Ulanmoqda..." : "Ulash"}
+                </button>
+              </div>
+              <p className={styles.hint}>
+                Batafsil qo&apos;llanma:{" "}
+                <code>docs/meta-setup.md</code>
+              </p>
+            </>
+          ) : (
+            <div className={styles.connectedBox}>
+              ✅ Facebook va Instagram ulandi. Ikkala kanaldan kelgan xabarlar{" "}
+              <strong>Xabarlar</strong> bo&apos;limiga tusha boshlaydi.
+            </div>
+          )}
+        </div>
+
         {/* Keyingi bosqichlar */}
         <div className={`${styles.card} ${styles.disabled}`}>
           <div className={styles.cardHeader}>
@@ -88,17 +156,6 @@ export default function ChannelsView() {
             </div>
           </div>
           <p className={styles.soon}>WhatsApp Business API integratsiyasi keyingi bosqichda qo&apos;shiladi.</p>
-        </div>
-
-        <div className={`${styles.card} ${styles.disabled}`}>
-          <div className={styles.cardHeader}>
-            <span className={`${styles.channelIcon} ${styles.instagram}`}>📸</span>
-            <div>
-              <h3>Instagram</h3>
-              <span className={styles.status}>Tez orada</span>
-            </div>
-          </div>
-          <p className={styles.soon}>Instagram Direct integratsiyasi keyingi bosqichda qo&apos;shiladi.</p>
         </div>
       </div>
     </div>

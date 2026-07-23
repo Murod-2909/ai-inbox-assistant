@@ -229,6 +229,29 @@
   color: $color-danger-strong;
 }
 
+.assignButton {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: $color-bg;
+  border: 1px solid $color-border;
+  color: $color-text-muted;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: $color-primary-soft;
+    color: $color-primary;
+  }
+}
+
+.assignButtonActive {
+  background: $color-primary-soft;
+  border-color: $color-primary;
+  color: $color-primary;
+}
+
 .messages {
   flex: 1;
   overflow-y: auto;

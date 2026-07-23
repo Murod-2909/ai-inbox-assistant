@@ -28,6 +28,47 @@
   padding: 2px 8px;
 }
 
+.filters {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid $color-border;
+}
+
+.filterTab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: $color-text-muted;
+  border-radius: 999px;
+  padding: 5px 10px;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: $color-bg;
+  }
+}
+
+.filterTabActive {
+  background: $color-primary-soft;
+  color: $color-primary;
+  font-weight: 600;
+}
+
+.filterCount {
+  font-size: 10px;
+  opacity: 0.75;
+}
+
+.filterEmpty {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: $color-text-muted;
+}
+
 .items {
   flex: 1;
   overflow-y: auto;

@@ -8,8 +8,9 @@ import { incomingEvents } from "@/lib/mock-realtime";
 import { playNewMessageSound } from "@/lib/sound";
 import { supabase } from "@/lib/supabase";
 import { WelcomeModal } from "@/components/WelcomeModal";
-import ConversationList from "./ConversationList";
+import ConversationList, { type InboxFilter } from "./ConversationList";
 import MessagePanel from "./MessagePanel";
+import EmptyInboxState from "./EmptyInboxState";
 import styles from "./InboxView.module.scss";
 
 // Backend ishlayotganda API'dan, ishlamasa mock ma'lumotlardan foydalanamiz
@@ -24,11 +25,27 @@ export default function InboxView() {
   const [selectedId, setSelectedId] = useState<string>("");
   const [panelOpen, setPanelOpen] = useState(false);
   const [flashId, setFlashId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<InboxFilter>("all");
+  const [operatorId, setOperatorId] = useState<string | null>(null);
 
   const selectedIdRef = useRef(selectedId);
   selectedIdRef.current = selectedId;
   // Oxirgi ko'rilgan holat — yangi xabar kelganini aniqlash (flash effekti) uchun
   const lastSeenRef = useRef<Map<string, string>>(new Map());
+
+  // Joriy operator ID — Supabase sessiyasidan (operators.id == auth.users.id,
+  // schema.sql'dagi trigger orqali). "Mening"/"Tayinlanmagan" filtri va
+  // tayinlash tugmasi shunga tayanadi.
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data }) => {
+      setOperatorId(data.session?.user.id ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setOperatorId(session?.user.id ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   const applyConversations = useCallback((fresh: Conversation[]) => {
     // Qaysi suhbatda yangi MIJOZ xabari paydo bo'ldi? Yorqinlik + ovozli signal.
@@ -162,6 +179,22 @@ export default function InboxView() {
     (a, b) =>
       new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime(),
   );
+
+  // Faqat backend rejimda va operator ma'lum bo'lsa filtr ma'noga ega
+  const canFilter = mode === "backend" && !!operatorId;
+  const filtered = canFilter
+    ? sorted.filter((c) => {
+        if (filter === "mine") return c.assignedOperatorId === operatorId;
+        if (filter === "unassigned") return !c.assignedOperatorId;
+        return true;
+      })
+    : sorted;
+  const filterCounts = {
+    all: conversations.length,
+    mine: conversations.filter((c) => c.assignedOperatorId === operatorId).length,
+    unassigned: conversations.filter((c) => !c.assignedOperatorId).length,
+  };
+
   const selected = conversations.find((c) => c.id === selectedId);
 
   function handleSelect(id: string) {
@@ -202,6 +235,18 @@ export default function InboxView() {
     setMessages((prev) => [...prev, local]);
   }
 
+  async function handleAssignToggle() {
+    if (!selected || !operatorId) return;
+    const nextId = selected.assignedOperatorId === operatorId ? null : operatorId;
+    // Optimistik yangilash — javobni kutmasdan UI'ni yangilaymiz
+    setConversations((prev) =>
+      prev.map((c) =>
+        c.id === selected.id ? { ...c, assignedOperatorId: nextId } : c,
+      ),
+    );
+    await api.assignConversation(selected.id, nextId);
+  }
+
   if (mode === "loading") {
     return <div className={styles.loading}>Yuklanmoqda...</div>;
   }
@@ -219,16 +264,22 @@ export default function InboxView() {
           className={`${styles.listPane} ${panelOpen ? styles.hideOnMobile : ""}`}
         >
           <ConversationList
-            conversations={sorted}
+            conversations={filtered}
             selectedId={selectedId}
             flashId={flashId}
             onSelect={handleSelect}
+            filter={filter}
+            onFilterChange={setFilter}
+            filterCounts={filterCounts}
+            showFilters={canFilter && conversations.length > 0}
           />
         </div>
         <div
           className={`${styles.panelPane} ${panelOpen ? "" : styles.hideOnMobile}`}
         >
-          {selected ? (
+          {conversations.length === 0 ? (
+            <EmptyInboxState />
+          ) : selected ? (
             <MessagePanel
               conversation={selected}
               messages={messages.filter(
@@ -236,6 +287,8 @@ export default function InboxView() {
               )}
               onBack={() => setPanelOpen(false)}
               onSend={handleSend}
+              currentOperatorId={mode === "backend" ? operatorId : null}
+              onAssignToggle={handleAssignToggle}
             />
           ) : (
             <div className={styles.empty}>Suhbat tanlang</div>
