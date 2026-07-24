@@ -12,6 +12,7 @@ import {
   showMessageNotification,
 } from "@/lib/notifications";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import ConversationList, { type InboxFilter } from "./ConversationList";
 import MessagePanel from "./MessagePanel";
@@ -24,6 +25,7 @@ type Mode = "loading" | "backend" | "mock";
 const POLL_INTERVAL_MS = 4000; // Supabase Realtime qo'shilgunga qadar oddiy polling
 
 export default function InboxView() {
+  const { t } = useLanguage();
   const [mode, setMode] = useState<Mode>("loading");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -283,23 +285,21 @@ export default function InboxView() {
   }
 
   if (mode === "loading") {
-    return <div className={styles.loading}>Yuklanmoqda...</div>;
+    return <div className={styles.loading}>{t("common.loading")}</div>;
   }
 
   return (
     <div className={styles.wrapper}>
       <WelcomeModal />
       {mode === "mock" && (
-        <div className={styles.demoBanner}>
-          Demo rejim — backend ulanmagan (namunaviy ma&apos;lumotlar)
-        </div>
+        <div className={styles.demoBanner}>{t("inbox.demoBanner")}</div>
       )}
       {notifPermission === "default" && (
         <button
           className={styles.notifBanner}
           onClick={handleEnableNotifications}
         >
-          🔔 Yangi xabarlar uchun bildirishnomalarni yoqish
+          {t("inbox.notifBanner")}
         </button>
       )}
       <div className={styles.inbox}>
@@ -336,7 +336,7 @@ export default function InboxView() {
               onAssignToggle={handleAssignToggle}
             />
           ) : (
-            <div className={styles.empty}>Suhbat tanlang</div>
+            <div className={styles.empty}>{t("inbox.selectConversation")}</div>
           )}
         </div>
       </div>

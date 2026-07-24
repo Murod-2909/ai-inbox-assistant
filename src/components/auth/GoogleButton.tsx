@@ -6,9 +6,11 @@
 // (native alert() o'rniga — u brauzer dizayniga mos emas edi).
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "@/app/(auth)/auth.module.scss";
 
 export default function GoogleButton({ label }: { label: string }) {
+  const { t } = useLanguage();
   const [showDemoNote, setShowDemoNote] = useState(false);
 
   async function handleClick() {
@@ -50,10 +52,7 @@ export default function GoogleButton({ label }: { label: string }) {
       </button>
 
       {showDemoNote && (
-        <p className={styles.infoBanner}>
-          ℹ️ Google orqali kirish Supabase Auth ulangach ishlaydi (hozircha
-          demo rejim — email va parol bilan davom eting).
-        </p>
+        <p className={styles.infoBanner}>{t("auth.google.demoNote")}</p>
       )}
     </div>
   );

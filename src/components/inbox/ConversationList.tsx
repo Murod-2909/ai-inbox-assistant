@@ -1,6 +1,7 @@
 "use client";
 
 import type { Conversation, Sentiment } from "@/lib/types";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "./ConversationList.module.scss";
 
 const sentimentDot: Record<Sentiment, string> = {
@@ -31,12 +32,6 @@ interface Props {
   onSearchChange: (query: string) => void;
 }
 
-const FILTER_TABS: { key: InboxFilter; label: string }[] = [
-  { key: "all", label: "Barchasi" },
-  { key: "mine", label: "Mening" },
-  { key: "unassigned", label: "Tayinlanmagan" },
-];
-
 export default function ConversationList({
   conversations,
   selectedId,
@@ -49,10 +44,18 @@ export default function ConversationList({
   searchQuery,
   onSearchChange,
 }: Props) {
+  const { t } = useLanguage();
+
+  const FILTER_TABS: { key: InboxFilter; label: string }[] = [
+    { key: "all", label: t("inbox.filter.all") },
+    { key: "mine", label: t("inbox.filter.mine") },
+    { key: "unassigned", label: t("inbox.filter.unassigned") },
+  ];
+
   return (
     <div className={styles.list}>
       <div className={styles.header}>
-        <h2>Xabarlar</h2>
+        <h2>{t("inbox.header.title")}</h2>
         <span className={styles.count}>{conversations.length}</span>
       </div>
 
@@ -60,7 +63,7 @@ export default function ConversationList({
         <span className={styles.searchIcon}>⌕</span>
         <input
           type="text"
-          placeholder="Qidirish..."
+          placeholder={t("inbox.search.placeholder")}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -68,7 +71,7 @@ export default function ConversationList({
           <button
             className={styles.searchClear}
             onClick={() => onSearchChange("")}
-            aria-label="Tozalash"
+            aria-label={t("inbox.search.clear")}
           >
             ✕
           </button>
@@ -129,12 +132,12 @@ export default function ConversationList({
         {conversations.length === 0 && (
           <p className={styles.filterEmpty}>
             {searchQuery
-              ? `"${searchQuery}" bo'yicha hech narsa topilmadi`
+              ? t("inbox.search.noResults", { query: searchQuery })
               : filter === "mine"
-                ? "Sizga tayinlangan suhbat yo'q"
+                ? t("inbox.filter.emptyMine")
                 : filter === "unassigned"
-                  ? "Tayinlanmagan suhbat yo'q"
-                  : "Suhbat yo'q"}
+                  ? t("inbox.filter.emptyUnassigned")
+                  : t("inbox.filter.emptyAll")}
           </p>
         )}
       </div>

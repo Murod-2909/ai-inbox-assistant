@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import * as api from "@/lib/api";
 import type { PlanTier, WorkingHours } from "@/lib/types";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "./ProfileTab.module.scss";
 
 const DEFAULT_HOURS: WorkingHours = {
@@ -14,13 +15,8 @@ const DEFAULT_HOURS: WorkingHours = {
     "Assalomu alaykum! Hozir ish vaqtimiz tugagan. Ertaga siz bilan albatta bog'lanamiz.",
 };
 
-const PLAN_LABEL: Record<PlanTier, string> = {
-  free: "Bepul",
-  start: "Start",
-  business: "Biznes",
-};
-
 export function ProfileTab() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [hours, setHours] = useState<WorkingHours>(DEFAULT_HOURS);
@@ -56,35 +52,35 @@ export function ProfileTab() {
   }
 
   if (loading) {
-    return <p className={styles.hint}>Yuklanmoqda...</p>;
+    return <p className={styles.hint}>{t("common.loading")}</p>;
   }
 
   return (
     <div className={styles.card}>
       <section className={styles.section}>
         <div className={styles.rowHeader}>
-          <h3>Joriy tarif</h3>
-          <span className={styles.planBadge}>{PLAN_LABEL[plan]}</span>
+          <h3>{t("settings.profile.currentPlan")}</h3>
+          <span className={styles.planBadge}>{t(`plan.${plan}`)}</span>
         </div>
         {plan !== "business" && (
           <Link href="/checkout" className={styles.upgradeLink}>
-            Tarifni yangilash →
+            {t("settings.profile.upgradeLink")}
           </Link>
         )}
       </section>
 
       <section className={styles.section}>
-        <h3>Biznes nomi</h3>
+        <h3>{t("settings.profile.businessName")}</h3>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Masalan, Gulzor Gullar Do'koni"
+          placeholder={t("settings.profile.businessNamePlaceholder")}
         />
       </section>
 
       <section className={styles.section}>
         <div className={styles.rowHeader}>
-          <h3>Ish vaqti</h3>
+          <h3>{t("settings.profile.workingHours")}</h3>
           <label className={styles.toggle}>
             <input
               type="checkbox"
@@ -94,15 +90,12 @@ export function ProfileTab() {
             <span className={styles.slider} />
           </label>
         </div>
-        <p className={styles.hint}>
-          Yoqilsa, ko&apos;rsatilgan oraliqdan tashqarida kelgan xabarlarga
-          avtomatik javob yuboriladi.
-        </p>
+        <p className={styles.hint}>{t("settings.profile.workingHoursHint")}</p>
 
         {hours.enabled && (
           <div className={styles.hoursGrid}>
             <label>
-              Boshlanishi
+              {t("settings.profile.start")}
               <input
                 type="time"
                 value={hours.start}
@@ -110,7 +103,7 @@ export function ProfileTab() {
               />
             </label>
             <label>
-              Tugashi
+              {t("settings.profile.end")}
               <input
                 type="time"
                 value={hours.end}
@@ -118,7 +111,7 @@ export function ProfileTab() {
               />
             </label>
             <label className={styles.fullWidth}>
-              Avtomatik javob matni
+              {t("settings.profile.autoReplyMessage")}
               <textarea
                 rows={3}
                 value={hours.message}
@@ -131,9 +124,9 @@ export function ProfileTab() {
 
       <div className={styles.actions}>
         <button onClick={handleSave} disabled={saving}>
-          {saving ? "Saqlanmoqda..." : "Saqlash"}
+          {saving ? t("common.saving") : t("common.save")}
         </button>
-        {saved && <span className={styles.savedNote}>Saqlandi ✓</span>}
+        {saved && <span className={styles.savedNote}>{t("settings.profile.savedNote")}</span>}
       </div>
     </div>
   );

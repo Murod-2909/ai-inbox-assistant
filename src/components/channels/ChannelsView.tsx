@@ -7,12 +7,14 @@ import {
   InstagramIcon,
   WhatsAppIcon,
 } from "@/components/icons/BrandIcons";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { SetupSteps } from "./SetupSteps";
 import styles from "./ChannelsView.module.scss";
 
 type ConnectionStatus = "disconnected" | "connecting" | "connected";
 
 export default function ChannelsView() {
+  const { t } = useLanguage();
   const [botToken, setBotToken] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("disconnected");
 
@@ -22,6 +24,12 @@ export default function ChannelsView() {
   // bitta umumiy holat, lekin foydalanuvchiga tushunarli bo'lishi uchun
   // ikkita alohida karta sifatida ko'rsatamiz.
   const [metaStatus, setMetaStatus] = useState<ConnectionStatus>("disconnected");
+
+  const STATUS_LABEL: Record<ConnectionStatus, string> = {
+    connected: t("channels.status.connected"),
+    connecting: t("channels.status.connecting"),
+    disconnected: t("channels.status.disconnected"),
+  };
 
   // Hozircha faqat UI — backend tayyor bo'lgach haqiqiy ulanish qo'shiladi
   function handleConnect() {
@@ -38,18 +46,11 @@ export default function ChannelsView() {
     setTimeout(() => setMetaStatus("connected"), 1200);
   }
 
-  const metaStatusLabel =
-    metaStatus === "connected"
-      ? "Ulangan"
-      : metaStatus === "connecting"
-        ? "Ulanmoqda..."
-        : "Ulanmagan";
-
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1>Kanallar</h1>
-        <p>Mijozlar yozadigan platformalarni ulang — barcha xabarlar bitta joyga tushadi.</p>
+        <h1>{t("channels.title")}</h1>
+        <p>{t("channels.subtitle")}</p>
       </header>
 
       <div className={styles.grid}>
@@ -58,17 +59,13 @@ export default function ChannelsView() {
           <div className={styles.cardHeader}>
             <TelegramIcon className={styles.channelIcon} />
             <div>
-              <h3>Telegram</h3>
+              <h3>{t("channel.telegram")}</h3>
               <span
                 className={`${styles.status} ${
                   status === "connected" ? styles.statusOn : ""
                 }`}
               >
-                {status === "connected"
-                  ? "Ulangan"
-                  : status === "connecting"
-                    ? "Ulanmoqda..."
-                    : "Ulanmagan"}
+                {STATUS_LABEL[status]}
               </span>
             </div>
           </div>
@@ -77,30 +74,15 @@ export default function ChannelsView() {
             <>
               <SetupSteps
                 steps={[
-                  {
-                    icon: "🔍",
-                    text: (
-                      <>
-                        Telegram&apos;da <strong>@BotFather</strong> ga yozing
-                      </>
-                    ),
-                  },
-                  {
-                    icon: "⌨️",
-                    text: (
-                      <>
-                        <code>/newbot</code> buyrug&apos;i bilan yangi bot
-                        yarating
-                      </>
-                    ),
-                  },
-                  { icon: "🔑", text: "Berilgan bot tokenini quyiga joylashtiring" },
+                  { icon: "🔍", text: t("channels.telegram.step1") },
+                  { icon: "⌨️", text: t("channels.telegram.step2") },
+                  { icon: "🔑", text: t("channels.telegram.step3") },
                 ]}
               />
               <div className={styles.form}>
                 <input
                   type="text"
-                  placeholder="Bot token (masalan: 123456:ABC-DEF...)"
+                  placeholder={t("channels.telegram.tokenPlaceholder")}
                   value={botToken}
                   onChange={(e) => setBotToken(e.target.value)}
                 />
@@ -108,14 +90,15 @@ export default function ChannelsView() {
                   onClick={handleConnect}
                   disabled={!botToken.trim() || status === "connecting"}
                 >
-                  {status === "connecting" ? "Ulanmoqda..." : "Ulash"}
+                  {status === "connecting"
+                    ? t("channels.status.connecting")
+                    : t("channels.connectButton")}
                 </button>
               </div>
             </>
           ) : (
             <div className={styles.connectedBox}>
-              ✅ Bot muvaffaqiyatli ulandi. Yangi xabarlar{" "}
-              <strong>Xabarlar</strong> bo&apos;limiga tusha boshlaydi.
+              {t("channels.telegram.connectedText")}
             </div>
           )}
         </div>
@@ -125,9 +108,9 @@ export default function ChannelsView() {
           <div className={styles.cardHeader}>
             <FacebookIcon className={styles.channelIcon} />
             <div>
-              <h3>Facebook Messenger</h3>
+              <h3>{t("channels.facebook.title")}</h3>
               <span className={`${styles.status} ${metaStatus === "connected" ? styles.statusOn : ""}`}>
-                {metaStatusLabel}
+                {STATUS_LABEL[metaStatus]}
               </span>
             </div>
           </div>
@@ -136,23 +119,15 @@ export default function ChannelsView() {
             <>
               <SetupSteps
                 steps={[
-                  {
-                    icon: "➕",
-                    text: (
-                      <>
-                        <strong>developers.facebook.com</strong>&apos;da App
-                        yarating
-                      </>
-                    ),
-                  },
-                  { icon: "🔗", text: "Facebook Page'ingizni ulang" },
-                  { icon: "🔑", text: "Page Access Token'ni quyiga joylashtiring" },
+                  { icon: "➕", text: t("channels.facebook.step1") },
+                  { icon: "🔗", text: t("channels.facebook.step2") },
+                  { icon: "🔑", text: t("channels.facebook.step3") },
                 ]}
               />
               <div className={styles.form}>
                 <input
                   type="text"
-                  placeholder="Page Access Token"
+                  placeholder={t("channels.facebook.tokenPlaceholder")}
                   value={pageToken}
                   onChange={(e) => setPageToken(e.target.value)}
                 />
@@ -160,17 +135,16 @@ export default function ChannelsView() {
                   onClick={handleMetaConnect}
                   disabled={!pageToken.trim() || metaStatus === "connecting"}
                 >
-                  {metaStatus === "connecting" ? "Ulanmoqda..." : "Ulash"}
+                  {metaStatus === "connecting"
+                    ? t("channels.status.connecting")
+                    : t("channels.connectButton")}
                 </button>
               </div>
-              <p className={styles.hint}>
-                Batafsil qo&apos;llanma: <code>docs/meta-setup.md</code>
-              </p>
+              <p className={styles.hint}>{t("channels.facebook.docsHint")}</p>
             </>
           ) : (
             <div className={styles.connectedBox}>
-              ✅ Facebook Page ulandi. Messenger xabarlari{" "}
-              <strong>Xabarlar</strong> bo&apos;limiga tusha boshlaydi.
+              {t("channels.facebook.connectedText")}
             </div>
           )}
         </div>
@@ -180,25 +154,19 @@ export default function ChannelsView() {
           <div className={styles.cardHeader}>
             <InstagramIcon className={styles.channelIcon} />
             <div>
-              <h3>Instagram</h3>
+              <h3>{t("channel.instagram")}</h3>
               <span className={`${styles.status} ${metaStatus === "connected" ? styles.statusOn : ""}`}>
-                {metaStatusLabel}
+                {STATUS_LABEL[metaStatus]}
               </span>
             </div>
           </div>
 
           {metaStatus === "connected" ? (
             <div className={styles.connectedBox}>
-              ✅ Instagram Facebook Page orqali avtomatik ulandi. DM xabarlari{" "}
-              <strong>Xabarlar</strong> bo&apos;limiga tusha boshlaydi.
+              {t("channels.instagram.connectedText")}
             </div>
           ) : (
-            <p className={styles.soon}>
-              Instagram Business akkaunt doim Facebook Page&apos;ga ulangan
-              bo&apos;ladi — shuning uchun alohida ulanish shart emas.{" "}
-              <strong>Facebook Messenger</strong> kartasida ulang, Instagram
-              ham avtomatik yoqiladi.
-            </p>
+            <p className={styles.soon}>{t("channels.instagram.notConnectedText")}</p>
           )}
         </div>
 
@@ -207,11 +175,11 @@ export default function ChannelsView() {
           <div className={styles.cardHeader}>
             <WhatsAppIcon className={styles.channelIcon} />
             <div>
-              <h3>WhatsApp</h3>
-              <span className={styles.status}>Tez orada</span>
+              <h3>{t("channel.whatsapp")}</h3>
+              <span className={styles.status}>{t("channels.status.soon")}</span>
             </div>
           </div>
-          <p className={styles.soon}>WhatsApp Business API integratsiyasi keyingi bosqichda qo&apos;shiladi.</p>
+          <p className={styles.soon}>{t("channels.whatsapp.soon")}</p>
         </div>
       </div>
     </div>

@@ -5,29 +5,18 @@
 import { useEffect, useState } from "react";
 import type { Stats } from "@/lib/types";
 import { fetchStats, reportExportUrl } from "@/lib/api";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "./AnalyticsView.module.scss";
 
-const EXPORT_OPTIONS: {
-  period: "week" | "month";
-  format: "xlsx" | "docx";
-  label: string;
-}[] = [
-  { period: "week", format: "xlsx", label: "Haftalik (Excel)" },
-  { period: "week", format: "docx", label: "Haftalik (Word)" },
-  { period: "month", format: "xlsx", label: "Oylik (Excel)" },
-  { period: "month", format: "docx", label: "Oylik (Word)" },
+const DAY_KEYS = [
+  "analytics.day.sun",
+  "analytics.day.mon",
+  "analytics.day.tue",
+  "analytics.day.wed",
+  "analytics.day.thu",
+  "analytics.day.fri",
+  "analytics.day.sat",
 ];
-
-const INTENT_LABELS: Record<string, string> = {
-  question: "Savol",
-  order: "Buyurtma",
-  feedback: "Fikr",
-  complaint: "Shikoyat",
-  other: "Boshqa",
-};
-
-// getDay(): 0 = yakshanba ... 6 = shanba
-const DAY_LABELS = ["Ya", "Du", "Se", "Cho", "Pa", "Ju", "Sha"];
 
 const MOCK_STATS: Stats = {
   todayMessages: 24,
@@ -44,21 +33,37 @@ const MOCK_STATS: Stats = {
   week: {},
 };
 
-/** Oxirgi 7 kunni {label, count} ko'rinishida tayyorlaydi (bo'sh kunlar 0). */
-function buildWeek(week: Record<string, number>): { day: string; count: number }[] {
-  const days: { day: string; count: number }[] = [];
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const key = date.toISOString().slice(0, 10); // "YYYY-MM-DD"
-    days.push({ day: DAY_LABELS[date.getDay()], count: week[key] ?? 0 });
-  }
-  return days;
-}
-
 export default function AnalyticsView() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState<Stats | null>(null);
   const [isMock, setIsMock] = useState(false);
+
+  const EXPORT_OPTIONS: { period: "week" | "month"; format: "xlsx" | "docx"; label: string }[] = [
+    { period: "week", format: "xlsx", label: t("analytics.export.weekExcel") },
+    { period: "week", format: "docx", label: t("analytics.export.weekWord") },
+    { period: "month", format: "xlsx", label: t("analytics.export.monthExcel") },
+    { period: "month", format: "docx", label: t("analytics.export.monthWord") },
+  ];
+
+  const INTENT_LABELS: Record<string, string> = {
+    question: t("analytics.intent.question"),
+    order: t("analytics.intent.order"),
+    feedback: t("analytics.intent.feedback"),
+    complaint: t("analytics.intent.complaint"),
+    other: t("analytics.intent.other"),
+  };
+
+  /** Oxirgi 7 kunni {label, count} ko'rinishida tayyorlaydi (bo'sh kunlar 0). */
+  function buildWeek(week: Record<string, number>): { day: string; count: number }[] {
+    const days: { day: string; count: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const key = date.toISOString().slice(0, 10); // "YYYY-MM-DD"
+      days.push({ day: t(DAY_KEYS[date.getDay()]), count: week[key] ?? 0 });
+    }
+    return days;
+  }
 
   useEffect(() => {
     fetchStats().then((fresh) => {
@@ -72,13 +77,13 @@ export default function AnalyticsView() {
   }, []);
 
   if (!stats) {
-    return <div className={styles.page}>Yuklanmoqda...</div>;
+    return <div className={styles.page}>{t("common.loading")}</div>;
   }
 
   const sentiment = [
-    { key: "positive", label: "Ijobiy", icon: "😊", count: stats.sentiment.positive },
-    { key: "neutral", label: "Neytral", icon: "😐", count: stats.sentiment.neutral },
-    { key: "negative", label: "Salbiy", icon: "😠", count: stats.sentiment.negative },
+    { key: "positive", label: t("analytics.sentiment.positive"), icon: "😊", count: stats.sentiment.positive },
+    { key: "neutral", label: t("analytics.sentiment.neutral"), icon: "😐", count: stats.sentiment.neutral },
+    { key: "negative", label: t("analytics.sentiment.negative"), icon: "😠", count: stats.sentiment.negative },
   ] as const;
   const sentimentTotal = Math.max(
     1,
@@ -91,25 +96,26 @@ export default function AnalyticsView() {
   }));
   const maxIntent = Math.max(1, ...intents.map((i) => i.count));
 
+  const mockDayOrder = [1, 2, 3, 4, 5, 6, 0]; // Du..Sha, Ya (Monday-first)
   const week = isMock
     ? [14, 18, 11, 22, 19, 8, 24].map((count, i) => ({
-        day: ["Du", "Se", "Cho", "Pa", "Ju", "Sha", "Ya"][i],
+        day: t(DAY_KEYS[mockDayOrder[i]]),
         count,
       }))
     : buildWeek(stats.week);
   const maxWeek = Math.max(1, ...week.map((d) => d.count));
 
   const cards = [
-    { label: "Bugungi xabarlar", value: String(stats.todayMessages) },
-    { label: "Javob kutmoqda", value: String(stats.unanswered) },
+    { label: t("analytics.card.todayMessages"), value: String(stats.todayMessages) },
+    { label: t("analytics.card.unanswered"), value: String(stats.unanswered) },
     {
-      label: "O'rtacha javob vaqti",
+      label: t("analytics.card.avgResponse"),
       value:
         stats.avgResponseMinutes === null
           ? "—"
-          : `${stats.avgResponseMinutes} daq`,
+          : `${stats.avgResponseMinutes} ${t("analytics.card.avgResponseUnit")}`,
     },
-    { label: "AI tahlillar", value: String(sentimentTotal) },
+    { label: t("analytics.card.aiAnalyses"), value: String(sentimentTotal) },
   ];
 
   return (
@@ -117,11 +123,9 @@ export default function AnalyticsView() {
       <header className={styles.header}>
         <div className={styles.headerTop}>
           <div>
-            <h1>Tahlil</h1>
+            <h1>{t("analytics.title")}</h1>
             <p>
-              {isMock
-                ? "Namunaviy ma'lumotlar (backend ulanmagan)"
-                : "Jonli ko'rsatkichlar — bazadagi haqiqiy ma'lumotlardan"}
+              {isMock ? t("analytics.subtitle.mock") : t("analytics.subtitle.live")}
             </p>
           </div>
           {!isMock && (
@@ -151,7 +155,7 @@ export default function AnalyticsView() {
 
       <div className={styles.chartGrid}>
         <section className={styles.card}>
-          <h2>Mijozlar kayfiyati</h2>
+          <h2>{t("analytics.sentiment.title")}</h2>
           <div className={styles.stackedBar}>
             {sentiment.map(
               (s) =>
@@ -180,7 +184,7 @@ export default function AnalyticsView() {
         </section>
 
         <section className={styles.card}>
-          <h2>Murojaat turlari</h2>
+          <h2>{t("analytics.intent.title")}</h2>
           <div className={styles.intentRows}>
             {intents.map((intent) => (
               <div key={intent.label} className={styles.intentRow}>
@@ -198,7 +202,7 @@ export default function AnalyticsView() {
         </section>
 
         <section className={`${styles.card} ${styles.wide}`}>
-          <h2>Haftalik xabarlar hajmi</h2>
+          <h2>{t("analytics.week.title")}</h2>
           <div className={styles.columns}>
             {week.map((d, index) => (
               <div key={`${d.day}-${index}`} className={styles.column}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "./ThemeToggle.module.scss";
 
 type Theme = "light" | "dark";
@@ -14,6 +15,7 @@ function currentTheme(): Theme {
 }
 
 export default function ThemeToggle() {
+  const { t } = useLanguage();
   const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
@@ -31,8 +33,8 @@ export default function ThemeToggle() {
     <button
       className={styles.toggle}
       onClick={toggle}
-      aria-label="Tema almashtirish"
-      title="Tema almashtirish"
+      aria-label={t("nav.theme")}
+      title={t("nav.theme")}
     >
       {theme === null ? "◐" : theme === "dark" ? "🌙" : "☀️"}
     </button>

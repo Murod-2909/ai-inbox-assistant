@@ -4,20 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import * as api from "@/lib/api";
 import type { TeamMember } from "@/lib/types";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "./TeamTab.module.scss";
 
-const ROLE_LABEL: Record<TeamMember["role"], string> = {
-  owner: "Egasi",
-  operator: "Operator",
-};
-
-const STATUS_LABEL: Record<TeamMember["status"], string> = {
-  available: "Faol",
-  busy: "Band",
-  offline: "Oflayn",
-};
-
 export function TeamTab() {
+  const { t } = useLanguage();
   const [members, setMembers] = useState<TeamMember[] | null>(null);
   const [operatorLimit, setOperatorLimit] = useState<number | null>(1);
   const [loading, setLoading] = useState(true);
@@ -26,6 +17,17 @@ export function TeamTab() {
   const [inviting, setInviting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [invited, setInvited] = useState<string | null>(null);
+
+  const ROLE_LABEL: Record<TeamMember["role"], string> = {
+    owner: t("settings.team.role.owner"),
+    operator: t("settings.team.role.operator"),
+  };
+
+  const STATUS_LABEL: Record<TeamMember["status"], string> = {
+    available: t("settings.team.status.available"),
+    busy: t("settings.team.status.busy"),
+    offline: t("settings.team.status.offline"),
+  };
 
   useEffect(() => {
     Promise.all([api.fetchTeam(), api.fetchBusiness()]).then(([list, biz]) => {
@@ -50,21 +52,18 @@ export function TeamTab() {
       setEmail("");
       setFullName("");
     } else {
-      setError("Taklif yuborilmadi. Email manzilni tekshiring yoki keyinroq urinib ko'ring.");
+      setError(t("settings.team.inviteError"));
     }
   }
 
   if (loading) {
-    return <p className={styles.hint}>Yuklanmoqda...</p>;
+    return <p className={styles.hint}>{t("common.loading")}</p>;
   }
 
   if (members === null) {
     return (
       <div className={styles.card}>
-        <p className={styles.hint}>
-          Jamoa funksiyasi faqat Supabase ulanganda ishlaydi. Hozircha demo
-          rejimda ishlayapsiz.
-        </p>
+        <p className={styles.hint}>{t("settings.team.demoOnly")}</p>
       </div>
     );
   }
@@ -73,35 +72,40 @@ export function TeamTab() {
     <div className={styles.wrap}>
       <div className={styles.card}>
         <div className={styles.rowHeader}>
-          <h3>Jamoaga taklif qilish</h3>
+          <h3>{t("settings.team.inviteTitle")}</h3>
           <span className={styles.usage}>
-            {members.length}/{operatorLimit ?? "∞"} operator
+            {t("settings.team.usage", {
+              count: members.length,
+              limit: operatorLimit ?? "∞",
+            })}
           </span>
         </div>
 
         {atLimit ? (
           <p className={styles.limitNote}>
-            Joriy tarifingizda operator limiti to&apos;ldi.{" "}
-            <Link href="/checkout">Tarifni yangilang →</Link>
+            {t("settings.team.limitReached")}{" "}
+            <Link href="/checkout">{t("settings.team.upgradeLink")}</Link>
           </p>
         ) : (
           <div className={styles.form}>
             <input
               type="email"
-              placeholder="email@misol.com"
+              placeholder={t("settings.team.emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <input
-              placeholder="Ismi (ixtiyoriy)"
+              placeholder={t("settings.team.namePlaceholder")}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
             />
             <button onClick={handleInvite} disabled={inviting || !email.trim()}>
-              {inviting ? "Yuborilmoqda..." : "Taklif yuborish"}
+              {inviting ? t("common.sending") : t("settings.team.inviteButton")}
             </button>
             {invited && (
-              <p className={styles.success}>{invited} manziliga taklif yuborildi ✓</p>
+              <p className={styles.success}>
+                {t("settings.team.inviteSuccess", { email: invited })}
+              </p>
             )}
             {error && <p className={styles.error}>{error}</p>}
           </div>
@@ -109,9 +113,9 @@ export function TeamTab() {
       </div>
 
       <div className={styles.card}>
-        <h3>Jamoa a&apos;zolari</h3>
+        <h3>{t("settings.team.membersTitle")}</h3>
         {members.length === 0 && (
-          <p className={styles.hint}>Hozircha faqat siz bor ekansiz.</p>
+          <p className={styles.hint}>{t("settings.team.onlyYou")}</p>
         )}
         <ul className={styles.list}>
           {members.map((m) => (

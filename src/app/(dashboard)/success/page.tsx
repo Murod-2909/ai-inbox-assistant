@@ -2,9 +2,12 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "./success.module.scss";
 
 export default function SuccessPage() {
+  const { t } = useLanguage();
+
   useEffect(() => {
     // Success analytics yuboring (optional)
     console.log("To'lov muvaffaqiyatli bo'ldi");
@@ -14,54 +17,48 @@ export default function SuccessPage() {
     <div className={styles.successPage}>
       <div className={styles.container}>
         <div className={styles.icon}>✓</div>
-        <h1>To'lov Muvaffaqiyatli!</h1>
-        <p>Raxmat! Sizning obunangiz faollashtirildi.</p>
+        <h1>{t("misc.success.title")}</h1>
+        <p>{t("misc.success.subtitle")}</p>
 
         <div className={styles.details}>
           <div className={styles.step}>
             <div className={styles.stepNumber}>1</div>
             <div>
-              <strong>Akkauntingiz tayyorlandı</strong>
-              <p>Barcha xususiyatlar o'rnatildi va ishlatish uchun tayyor.</p>
+              <strong>{t("misc.success.step1Title")}</strong>
+              <p>{t("misc.success.step1Text")}</p>
             </div>
           </div>
 
           <div className={styles.step}>
             <div className={styles.stepNumber}>2</div>
             <div>
-              <strong>Telegram botini ulang</strong>
-              <p>
-                Sozlamalarda @BotFather'dan olingan tokenni kiriting — ishga
-                tushirish uchun 1 daqiqa kifoya.
-              </p>
+              <strong>{t("misc.success.step2Title")}</strong>
+              <p>{t("misc.success.step2Text")}</p>
             </div>
           </div>
 
           <div className={styles.step}>
             <div className={styles.stepNumber}>3</div>
             <div>
-              <strong>Xabarlar oqib keladi</strong>
-              <p>
-                Barcha mijoz xabarlari darhol inbox'ingizga tushadi. AI tahlil
-                avtomatik ishlaydi.
-              </p>
+              <strong>{t("misc.success.step3Title")}</strong>
+              <p>{t("misc.success.step3Text")}</p>
             </div>
           </div>
         </div>
 
         <div className={styles.actions}>
           <Link href="/inbox" className={styles.primaryButton}>
-            Inbox'ga o'tish
+            {t("misc.success.goInbox")}
           </Link>
           <Link href="/settings" className={styles.secondaryButton}>
-            Sozlamalar
+            {t("misc.success.goSettings")}
           </Link>
         </div>
 
         <p className={styles.support}>
-          Biror savolingiz bo'lsa,{" "}
-          <a href="mailto:support@example.com">support@example.com</a> ga
-          yozing.
+          {t("misc.success.supportPrefix")}{" "}
+          <a href="mailto:support@example.com">support@example.com</a>{" "}
+          {t("misc.success.supportSuffix")}
         </p>
       </div>
     </div>

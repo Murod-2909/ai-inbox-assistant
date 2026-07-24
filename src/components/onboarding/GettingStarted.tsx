@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { ChannelIconCluster } from "./ChannelIconCluster";
 import styles from "./GettingStarted.module.scss";
 
@@ -17,46 +18,44 @@ interface Task {
   comingSoon?: boolean;
 }
 
-// Faqat mahsulotda haqiqatan mavjud (yoki Sozlamalar sahifasida rejalashtirilgan)
-// vazifalar — soxta "Lifecycle" yoki boshqa ishlamaydigan funksiyalar yo'q.
-const TASKS: Task[] = [
-  {
-    id: "channel",
-    title: "Kanal ulang — xabarlarni bitta joyga yig'ing",
-    description:
-      "Telegram, keyinroq WhatsApp va Instagram — mijozlar yozgan platformadan qat'i nazar, barcha xabarlar bitta inbox'ga tushadi.",
-    cta: "Kanalni ulash",
-    href: "/channels",
-  },
-  {
-    id: "ai",
-    title: "AI tahlil qanday ishlashini ko'ring",
-    description:
-      "Har bir xabarning kayfiyati (ijobiy/neytral/salbiy) va maqsadi (savol/shikoyat/buyurtma) avtomatik aniqlanadi, tayyor javob taklif qilinadi.",
-    cta: "Inbox'ni ochish",
-    href: "/inbox",
-  },
-  {
-    id: "templates",
-    title: "Tezkor javob shablonlarini sozlang",
-    description:
-      "Ko'p so'raladigan savollarga (ish vaqti, narx, yetkazib berish) tayyor javoblar — jamoa bir xilda va tez javob beradi.",
-    cta: "Sozlamalarga o'tish",
-    href: "/settings",
-  },
-  {
-    id: "team",
-    title: "Jamoa a'zolarini taklif qiling",
-    description:
-      "Operatorlarni qo'shib, suhbatlarni birga boshqaring. Bu funksiya hozircha tayyorlanmoqda.",
-    cta: "Tez orada",
-    href: "/settings",
-    comingSoon: true,
-  },
-];
-
 export function GettingStarted({ name }: { name?: string }) {
+  const { t } = useLanguage();
   const [done, setDone] = useState<Set<string>>(new Set());
+
+  // Faqat mahsulotda haqiqatan mavjud (yoki Sozlamalar sahifasida rejalashtirilgan)
+  // vazifalar — soxta "Lifecycle" yoki boshqa ishlamaydigan funksiyalar yo'q.
+  const TASKS: Task[] = [
+    {
+      id: "channel",
+      title: t("misc.onboarding.task.channel.title"),
+      description: t("misc.onboarding.task.channel.description"),
+      cta: t("misc.onboarding.task.channel.cta"),
+      href: "/channels",
+    },
+    {
+      id: "ai",
+      title: t("misc.onboarding.task.ai.title"),
+      description: t("misc.onboarding.task.ai.description"),
+      cta: t("misc.onboarding.task.ai.cta"),
+      href: "/inbox",
+    },
+    {
+      id: "templates",
+      title: t("misc.onboarding.task.templates.title"),
+      description: t("misc.onboarding.task.templates.description"),
+      cta: t("misc.onboarding.task.templates.cta"),
+      href: "/settings",
+    },
+    {
+      id: "team",
+      title: t("misc.onboarding.task.team.title"),
+      description: t("misc.onboarding.task.team.description"),
+      cta: t("channels.status.soon"),
+      href: "/settings",
+      comingSoon: true,
+    },
+  ];
+
   const [openId, setOpenId] = useState<string>(TASKS[0].id);
 
   useEffect(() => {
@@ -87,7 +86,7 @@ export function GettingStarted({ name }: { name?: string }) {
     <div className={styles.page}>
       <div className={styles.main}>
         <div className={styles.header}>
-          <h1>👋 Salom, {name || "do'stim"}! Boshlaymiz.</h1>
+          <h1>{t("misc.onboarding.greeting", { name: name || t("misc.onboarding.defaultName") })}</h1>
           <div className={styles.progress}>
             <div className={styles.progressTrack}>
               <motion.div
@@ -138,7 +137,7 @@ export function GettingStarted({ name }: { name?: string }) {
                         <div className={styles.itemText}>
                           <p>{task.description}</p>
                           {task.comingSoon ? (
-                            <span className={styles.soonBadge}>Tez orada</span>
+                            <span className={styles.soonBadge}>{task.cta}</span>
                           ) : (
                             <Link
                               href={task.href}
@@ -164,17 +163,17 @@ export function GettingStarted({ name }: { name?: string }) {
         </div>
 
         <Link href="/inbox" className={styles.skip}>
-          Inbox&apos;ga o&apos;tish →
+          {t("misc.onboarding.skipToInbox")}
         </Link>
       </div>
 
       <aside className={styles.sidebar}>
-        <h2>Resurslar</h2>
+        <h2>{t("misc.onboarding.resourcesTitle")}</h2>
         <a href="mailto:support@example.com" className={styles.resource}>
-          <span>💬</span> Qo&apos;llab-quvvatlash bilan bog&apos;lanish
+          <span>💬</span> {t("misc.onboarding.contactSupport")}
         </a>
         <Link href="/inbox" className={styles.resource}>
-          <span>🎬</span> Jonli demoni ko&apos;rish
+          <span>🎬</span> {t("misc.onboarding.viewDemo")}
         </Link>
       </aside>
     </div>

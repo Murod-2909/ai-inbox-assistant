@@ -10,15 +10,23 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import GoogleButton from "@/components/auth/GoogleButton";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "../auth.module.scss";
 
 type Step = "form" | "verify" | "onboarding";
 
-const CATEGORIES = ["🛍 Do'kon", "🏥 Klinika", "💇 Salon", "📚 O'quv markazi", "Boshqa"];
-
 export default function SignupPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [step, setStep] = useState<Step>("form");
+
+  const CATEGORIES = [
+    { icon: "🛍", label: t("auth.category.shop") },
+    { icon: "🏥", label: t("auth.category.clinic") },
+    { icon: "💇", label: t("auth.category.salon") },
+    { icon: "📚", label: t("auth.category.education") },
+    { icon: "", label: t("auth.category.other") },
+  ];
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -32,9 +40,9 @@ export default function SignupPage() {
 
   function validate(): boolean {
     const found: Record<string, string> = {};
-    if (name.trim().length < 2) found.name = "Ismingizni kiriting";
-    if (!/^\S+@\S+\.\S+$/.test(email)) found.email = "Email noto'g'ri formatda";
-    if (password.length < 6) found.password = "Parol kamida 6 belgi bo'lsin";
+    if (name.trim().length < 2) found.name = t("auth.signup.errName");
+    if (!/^\S+@\S+\.\S+$/.test(email)) found.email = t("auth.signup.errEmail");
+    if (password.length < 6) found.password = t("auth.signup.errPassword");
     setErrors(found);
     return Object.keys(found).length === 0;
   }
@@ -57,8 +65,8 @@ export default function SignupPage() {
       if (error) {
         setServerError(
           error.message === "User already registered"
-            ? "Bu email allaqachon ro'yxatdan o'tgan — Kirish sahifasidan foydalaning"
-            : "Ro'yxatdan o'tishda xatolik: " + error.message,
+            ? t("auth.signup.errUserExists")
+            : t("auth.signup.errGeneric", { message: error.message }),
         );
         return;
       }
@@ -74,14 +82,13 @@ export default function SignupPage() {
     return (
       <div className={styles.successState}>
         <span className={styles.successIcon}>📬</span>
-        <h2>Emailingizni tekshiring</h2>
+        <h2>{t("auth.signup.verify.title")}</h2>
         <p>
-          <strong>{email}</strong> manziliga tasdiqlash havolasi yubordik.
-          Havolani bosganingizdan so&apos;ng hisobingiz faollashadi.
+          {t("auth.signup.verify.text", { email })}
           {!supabase && (
             <>
               <br />
-              (Demo rejim — hozircha xat yuborilmaydi)
+              {t("auth.signup.verify.demoNote")}
             </>
           )}
         </p>
@@ -89,7 +96,7 @@ export default function SignupPage() {
           className={styles.submitButton}
           onClick={() => setStep("onboarding")}
         >
-          Tasdiqladim — davom etish
+          {t("auth.signup.verify.continue")}
         </button>
       </div>
     );
@@ -103,34 +110,32 @@ export default function SignupPage() {
           <span className={styles.stepDone} />
           <span />
         </div>
-        <h1 className={styles.title}>Biznesingiz haqida</h1>
-        <p className={styles.subtitle}>
-          Dashboard&apos;ni sizga moslashtirishimiz uchun bir daqiqa
-        </p>
+        <h1 className={styles.title}>{t("auth.signup.onboarding.title")}</h1>
+        <p className={styles.subtitle}>{t("auth.signup.onboarding.subtitle")}</p>
 
         <div className={styles.field}>
-          <label htmlFor="business">Biznes nomi</label>
+          <label htmlFor="business">{t("auth.signup.onboarding.businessNameLabel")}</label>
           <input
             id="business"
             type="text"
-            placeholder="Masalan: Go'zallik saloni «Nilufar»"
+            placeholder={t("auth.signup.onboarding.businessNamePlaceholder")}
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
           />
         </div>
 
         <div className={styles.field}>
-          <label>Faoliyat turi</label>
+          <label>{t("auth.signup.onboarding.categoryLabel")}</label>
         </div>
         <div className={styles.categoryChips}>
           {CATEGORIES.map((item) => (
             <button
-              key={item}
+              key={item.label}
               type="button"
-              className={`${styles.chip} ${category === item ? styles.chipActive : ""}`}
-              onClick={() => setCategory(item)}
+              className={`${styles.chip} ${category === item.label ? styles.chipActive : ""}`}
+              onClick={() => setCategory(item.label)}
             >
-              {item}
+              {item.icon ? `${item.icon} ${item.label}` : item.label}
             </button>
           ))}
         </div>
@@ -140,7 +145,7 @@ export default function SignupPage() {
           disabled={!businessName.trim() || !category}
           onClick={finishOnboarding}
         >
-          Dashboard&apos;ga o&apos;tish →
+          {t("auth.signup.onboarding.submit")}
         </button>
       </div>
     );
@@ -148,23 +153,21 @@ export default function SignupPage() {
 
   return (
     <div>
-      <h1 className={styles.title}>Hisob yarating</h1>
-      <p className={styles.subtitle}>
-        Bepul boshlang — karta talab qilinmaydi
-      </p>
+      <h1 className={styles.title}>{t("auth.signup.title")}</h1>
+      <p className={styles.subtitle}>{t("auth.signup.subtitle")}</p>
 
-      <GoogleButton label="Google bilan davom etish" />
-      <div className={styles.divider}>yoki email bilan</div>
+      <GoogleButton label={t("auth.signup.googleLabel")} />
+      <div className={styles.divider}>{t("auth.divider.orEmail")}</div>
 
       {serverError && <div className={styles.errorBanner}>{serverError}</div>}
 
       <form onSubmit={handleSubmit} noValidate>
         <div className={`${styles.field} ${errors.name ? styles.fieldError : ""}`}>
-          <label htmlFor="name">Ismingiz</label>
+          <label htmlFor="name">{t("auth.nameLabel")}</label>
           <input
             id="name"
             type="text"
-            placeholder="Aziza Karimova"
+            placeholder={t("auth.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -172,11 +175,11 @@ export default function SignupPage() {
         </div>
 
         <div className={`${styles.field} ${errors.email ? styles.fieldError : ""}`}>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">{t("auth.emailLabel")}</label>
           <input
             id="email"
             type="email"
-            placeholder="siz@biznes.uz"
+            placeholder={t("auth.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -188,11 +191,11 @@ export default function SignupPage() {
         <div
           className={`${styles.field} ${errors.password ? styles.fieldError : ""}`}
         >
-          <label htmlFor="password">Parol</label>
+          <label htmlFor="password">{t("auth.passwordLabel")}</label>
           <input
             id="password"
             type="password"
-            placeholder="Kamida 6 belgi"
+            placeholder={t("auth.signup.passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -202,12 +205,12 @@ export default function SignupPage() {
         </div>
 
         <button type="submit" className={styles.submitButton} disabled={submitting}>
-          {submitting ? "Yaratilmoqda..." : "Ro'yxatdan o'tish"}
+          {submitting ? t("auth.signup.submitting") : t("auth.signup.submit")}
         </button>
       </form>
 
       <p className={styles.switchLine}>
-        Hisobingiz bormi? <Link href="/login">Kirish</Link>
+        {t("auth.signup.haveAccount")} <Link href="/login">{t("auth.signup.loginLink")}</Link>
       </p>
     </div>
   );

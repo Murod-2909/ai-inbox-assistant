@@ -1,0 +1,61 @@
+@use "@/styles/variables" as *;
+
+.wrap {
+  position: relative;
+}
+
+.trigger {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+  background: $color-surface;
+  font-size: 12px;
+  font-weight: 700;
+  color: $color-text-muted;
+  transition: background 0.15s;
+
+  &:hover {
+    background: $color-bg;
+  }
+}
+
+.menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  padding: 4px;
+
+  &.menuDown {
+    bottom: auto;
+    top: calc(100% + 6px);
+  }
+}
+
+.option {
+  text-align: left;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: $radius-sm;
+  color: $color-text;
+
+  &:hover {
+    background: $color-bg;
+  }
+
+  &.active {
+    color: $color-primary;
+    font-weight: 600;
+    background: $color-primary-soft;
+  }
+}

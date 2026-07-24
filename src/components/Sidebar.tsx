@@ -4,20 +4,26 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { fetchBusiness } from "@/lib/api";
+import type { PlanTier } from "@/lib/types";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import ThemeToggle from "./ThemeToggle";
+import LanguageSwitcher from "./LanguageSwitcher";
 import styles from "./Sidebar.module.scss";
-
-const navItems = [
-  { href: "/inbox", label: "Xabarlar", icon: "💬" },
-  { href: "/channels", label: "Kanallar", icon: "🔌" },
-  { href: "/analytics", label: "Tahlil", icon: "📊" },
-  { href: "/settings", label: "Sozlamalar", icon: "⚙️" },
-];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLanguage();
   const [userName, setUserName] = useState<string | null>(null);
+  const [plan, setPlan] = useState<PlanTier>("free");
+
+  const navItems = [
+    { href: "/inbox", label: t("nav.inbox"), icon: "💬" },
+    { href: "/channels", label: t("nav.channels"), icon: "🔌" },
+    { href: "/analytics", label: t("nav.analytics"), icon: "📊" },
+    { href: "/settings", label: t("nav.settings"), icon: "⚙️" },
+  ];
 
   // Supabase sessiyasini kuzatamiz: kim kirgan bo'lsa ismini ko'rsatamiz
   useEffect(() => {
@@ -31,6 +37,12 @@ export default function Sidebar() {
       setUserName(user ? (user.user_metadata?.full_name as string) || user.email || "Operator" : null);
     });
     return () => sub.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    fetchBusiness().then((biz) => {
+      if (biz) setPlan(biz.plan);
+    });
   }, []);
 
   async function handleLogout() {
@@ -67,18 +79,21 @@ export default function Sidebar() {
             {(userName ?? "D").charAt(0).toUpperCase()}
           </div>
           <div className={styles.businessInfo}>
-            <div className={styles.businessName}>{userName ?? "Demo biznes"}</div>
-            <div className={styles.businessPlan}>Bepul tarif</div>
+            <div className={styles.businessName}>{userName ?? t("nav.defaultBusiness")}</div>
+            <div className={styles.businessPlan}>
+              {t("nav.planLabel", { plan: t(`plan.${plan}`) })}
+            </div>
           </div>
           {userName && (
             <button
               className={styles.logoutButton}
               onClick={handleLogout}
-              title="Chiqish"
+              title={t("nav.logout")}
             >
               ⎋
             </button>
           )}
+          <LanguageSwitcher />
           <ThemeToggle />
         </div>
       </div>

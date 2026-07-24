@@ -10,28 +10,8 @@ import type {
   Sentiment,
 } from "@/lib/types";
 import * as api from "@/lib/api";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "./MessagePanel.module.scss";
-
-// Backend ishlamayotganda (demo rejim) ko'rinadigan standart shablonlar
-const FALLBACK_TEMPLATES: ReplyTemplate[] = [
-  { id: "t1", title: "Salomlashish", text: "Assalomu alaykum! Xush kelibsiz, sizga qanday yordam bera olamiz?" },
-  { id: "t2", title: "Ish vaqti", text: "Ish vaqtimiz: dushanba–shanba, 9:00 dan 18:00 gacha." },
-  { id: "t3", title: "Kutish", text: "Xabaringizni oldik! Mutaxassisimiz tez orada javob beradi." },
-];
-
-const sentimentLabels: Record<Sentiment, { text: string; className: string }> = {
-  positive: { text: "😊 Ijobiy", className: styles.badgePositive },
-  neutral: { text: "😐 Neytral", className: styles.badgeNeutral },
-  negative: { text: "😠 Salbiy", className: styles.badgeNegative },
-};
-
-const intentLabels: Record<Intent, string> = {
-  question: "❓ Savol",
-  complaint: "⚠️ Shikoyat",
-  order: "🛒 Buyurtma",
-  feedback: "💬 Fikr",
-  other: "📋 Boshqa",
-};
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString("uz-UZ", {
@@ -99,6 +79,7 @@ export default function MessagePanel({
   currentOperatorId,
   onAssignToggle,
 }: Props) {
+  const { t } = useLanguage();
   const { customer, analysis } = conversation;
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
@@ -108,6 +89,27 @@ export default function MessagePanel({
   const [showNotes, setShowNotes] = useState(false);
   const [noteDraft, setNoteDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
+
+  const sentimentLabels: Record<Sentiment, { text: string; className: string }> = {
+    positive: { text: t("inbox.panel.sentimentPositive"), className: styles.badgePositive },
+    neutral: { text: t("inbox.panel.sentimentNeutral"), className: styles.badgeNeutral },
+    negative: { text: t("inbox.panel.sentimentNegative"), className: styles.badgeNegative },
+  };
+
+  const intentLabels: Record<Intent, string> = {
+    question: t("inbox.panel.intentQuestion"),
+    complaint: t("inbox.panel.intentComplaint"),
+    order: t("inbox.panel.intentOrder"),
+    feedback: t("inbox.panel.intentFeedback"),
+    other: t("inbox.panel.intentOther"),
+  };
+
+  // Backend ishlamayotganda (demo rejim) ko'rinadigan standart shablonlar
+  const FALLBACK_TEMPLATES: ReplyTemplate[] = [
+    { id: "t1", title: t("inbox.fallbackTemplate1Title"), text: t("inbox.fallbackTemplate1Text") },
+    { id: "t2", title: t("inbox.fallbackTemplate2Title"), text: t("inbox.fallbackTemplate2Text") },
+    { id: "t3", title: t("inbox.fallbackTemplate3Title"), text: t("inbox.fallbackTemplate3Text") },
+  ];
 
   // Boshqa suhbatga o'tilganda yozilayotgan matn va eslatmalar holatini tozalaymiz
   useEffect(() => {
@@ -122,7 +124,8 @@ export default function MessagePanel({
     api.fetchTemplates().then((fresh) => {
       setTemplates(fresh ?? FALLBACK_TEMPLATES);
     });
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- FALLBACK_TEMPLATES faqat tilga bog'liq, cheksiz tsikl yaratmaydi
+  }, [t]);
 
   async function toggleNotes() {
     const next = !showNotes;
@@ -166,14 +169,14 @@ export default function MessagePanel({
           <button
             className={styles.backButton}
             onClick={onBack}
-            aria-label="Orqaga"
+            aria-label={t("inbox.panel.back")}
           >
             ←
           </button>
           <div>
             <div className={styles.name}>{customer.name}</div>
             <div className={styles.meta}>
-              <span className={styles.channel}>Telegram</span>
+              <span className={styles.channel}>{t(`channel.${customer.channel}`)}</span>
               {customer.username && <span>{customer.username}</span>}
             </div>
           </div>
@@ -201,16 +204,16 @@ export default function MessagePanel({
               onClick={onAssignToggle}
             >
               {conversation.assignedOperatorId === currentOperatorId
-                ? "✓ Menga tayinlangan"
+                ? t("inbox.panel.assignedToMe")
                 : conversation.assignedOperatorId
-                  ? "Boshqa operatorga tayinlangan"
-                  : "Menga tayinlash"}
+                  ? t("inbox.panel.assignedToOther")
+                  : t("inbox.panel.assignToMe")}
             </button>
           )}
           <button
             className={`${styles.iconButton} ${showNotes ? styles.iconButtonActive : ""}`}
             onClick={toggleNotes}
-            title="Ichki eslatmalar (mijoz ko'rmaydi)"
+            title={t("inbox.panel.notesToggleTitle")}
           >
             🗒
           </button>
@@ -219,15 +222,11 @@ export default function MessagePanel({
 
       {showNotes && (
         <div className={styles.notesPanel}>
-          <div className={styles.notesTitle}>
-            Ichki eslatmalar — faqat operatorlar ko&apos;radi
-          </div>
+          <div className={styles.notesTitle}>{t("inbox.panel.notesHeader")}</div>
           {notes === null ? (
-            <p className={styles.notesEmpty}>
-              Eslatmalar uchun backend kerak (demo rejimda mavjud emas)
-            </p>
+            <p className={styles.notesEmpty}>{t("inbox.panel.notesUnavailable")}</p>
           ) : notes.length === 0 ? (
-            <p className={styles.notesEmpty}>Hozircha eslatma yo&apos;q</p>
+            <p className={styles.notesEmpty}>{t("inbox.panel.notesEmpty")}</p>
           ) : (
             <ul className={styles.notesList}>
               {notes.map((note) => (
@@ -244,7 +243,7 @@ export default function MessagePanel({
             <div className={styles.noteForm}>
               <input
                 type="text"
-                placeholder="Eslatma yozing..."
+                placeholder={t("inbox.panel.notePlaceholder")}
                 value={noteDraft}
                 onChange={(e) => setNoteDraft(e.target.value)}
                 onKeyDown={(e) => {
@@ -252,7 +251,7 @@ export default function MessagePanel({
                 }}
               />
               <button onClick={handleAddNote} disabled={!noteDraft.trim()}>
-                Qo&apos;shish
+                {t("common.add")}
               </button>
             </div>
           )}
@@ -277,12 +276,12 @@ export default function MessagePanel({
       {analysis && (
         <div className={styles.suggestion}>
           <div className={styles.suggestionHeader}>
-            <span>✨ AI javob taklifi</span>
+            <span>{t("inbox.panel.aiSuggestion")}</span>
             <button
               className={styles.useButton}
               onClick={() => setDraft(analysis.suggestedReply)}
             >
-              Ishlatish
+              {t("inbox.panel.useSuggestion")}
             </button>
           </div>
           <p className={styles.suggestionText}>{analysis.suggestedReply}</p>
@@ -311,12 +310,12 @@ export default function MessagePanel({
         <button
           className={`${styles.iconButton} ${showTemplates ? styles.iconButtonActive : ""}`}
           onClick={() => setShowTemplates((prev) => !prev)}
-          title="Tezkor javob shablonlari"
+          title={t("inbox.panel.templatesToggleTitle")}
         >
           ⚡
         </button>
         <textarea
-          placeholder="Javob yozing..."
+          placeholder={t("inbox.panel.composerPlaceholder")}
           rows={2}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -333,7 +332,7 @@ export default function MessagePanel({
           disabled={!draft.trim() || sending}
           onClick={handleSend}
         >
-          {sending ? "Yuborilmoqda..." : "Yuborish"}
+          {sending ? t("common.sending") : t("common.send")}
         </button>
       </footer>
     </div>

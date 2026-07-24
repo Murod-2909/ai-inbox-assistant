@@ -4,34 +4,36 @@ import { useState } from "react";
 import { ProfileTab } from "./ProfileTab";
 import { TemplatesTab } from "./TemplatesTab";
 import { TeamTab } from "./TeamTab";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "./SettingsView.module.scss";
 
 type Tab = "profile" | "templates" | "team";
 
-const TABS: { key: Tab; label: string; icon: string }[] = [
-  { key: "profile", label: "Profil", icon: "🏢" },
-  { key: "templates", label: "Shablonlar", icon: "⚡" },
-  { key: "team", label: "Jamoa", icon: "👥" },
-];
-
 export default function SettingsView() {
+  const { t } = useLanguage();
   const [tab, setTab] = useState<Tab>("profile");
+
+  const TABS: { key: Tab; label: string; icon: string }[] = [
+    { key: "profile", label: t("settings.tab.profile"), icon: "🏢" },
+    { key: "templates", label: t("settings.tab.templates"), icon: "⚡" },
+    { key: "team", label: t("settings.tab.team"), icon: "👥" },
+  ];
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1>Sozlamalar</h1>
-        <p>Biznes profili, javob shablonlari va jamoa a&apos;zolarini boshqaring.</p>
+        <h1>{t("settings.title")}</h1>
+        <p>{t("settings.subtitle")}</p>
       </header>
 
       <div className={styles.tabs}>
-        {TABS.map((t) => (
+        {TABS.map((tabItem) => (
           <button
-            key={t.key}
-            className={`${styles.tab} ${tab === t.key ? styles.tabActive : ""}`}
-            onClick={() => setTab(t.key)}
+            key={tabItem.key}
+            className={`${styles.tab} ${tab === tabItem.key ? styles.tabActive : ""}`}
+            onClick={() => setTab(tabItem.key)}
           >
-            <span>{t.icon}</span> {t.label}
+            <span>{tabItem.icon}</span> {tabItem.label}
           </button>
         ))}
       </div>

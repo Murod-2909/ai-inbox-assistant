@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { StripeProvider } from "@/components/StripeProvider";
 import { CustomCursor } from "@/components/cursor/CustomCursor";
+import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import "./globals.scss";
 
 const geistSans = Geist({
@@ -41,7 +42,9 @@ export default function RootLayout({
       </head>
       <body>
         <CustomCursor />
-        <StripeProvider>{children}</StripeProvider>
+        <LanguageProvider>
+          <StripeProvider>{children}</StripeProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

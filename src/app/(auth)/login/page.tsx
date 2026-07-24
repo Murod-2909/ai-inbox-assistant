@@ -8,10 +8,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import GoogleButton from "@/components/auth/GoogleButton";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "../auth.module.scss";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
@@ -24,7 +26,7 @@ export default function LoginPage() {
 
     if (!/^\S+@\S+\.\S+$/.test(email) || password.length < 6) {
       // Xavfsizlik qoidasi: qaysi maydon xatoligini oshkor qilmaymiz
-      setError("Email yoki parol noto'g'ri. Qayta urinib ko'ring.");
+      setError(t("auth.login.errorGeneric"));
       return;
     }
 
@@ -40,8 +42,8 @@ export default function LoginPage() {
         setLoading(false);
         setError(
           authError.message === "Email not confirmed"
-            ? "Email hali tasdiqlanmagan — pochtangizdagi havolani bosing"
-            : "Email yoki parol noto'g'ri. Qayta urinib ko'ring.",
+            ? t("auth.login.errorNotConfirmed")
+            : t("auth.login.errorGeneric"),
         );
         return;
       }
@@ -55,21 +57,21 @@ export default function LoginPage() {
 
   return (
     <div>
-      <h1 className={styles.title}>Xush kelibsiz!</h1>
-      <p className={styles.subtitle}>Hisobingizga kiring</p>
+      <h1 className={styles.title}>{t("auth.login.title")}</h1>
+      <p className={styles.subtitle}>{t("auth.login.subtitle")}</p>
 
-      <GoogleButton label="Google bilan kirish" />
-      <div className={styles.divider}>yoki</div>
+      <GoogleButton label={t("auth.login.googleLabel")} />
+      <div className={styles.divider}>{t("auth.divider.or")}</div>
 
       {error && <div className={styles.errorBanner}>{error}</div>}
 
       <form onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">{t("auth.emailLabel")}</label>
           <input
             id="email"
             type="email"
-            placeholder="siz@biznes.uz"
+            placeholder={t("auth.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -77,8 +79,8 @@ export default function LoginPage() {
 
         <div className={styles.field}>
           <div className={styles.labelRow}>
-            <label htmlFor="password">Parol</label>
-            <Link href="/reset">Parolni unutdingizmi?</Link>
+            <label htmlFor="password">{t("auth.passwordLabel")}</label>
+            <Link href="/reset">{t("auth.login.forgotPassword")}</Link>
           </div>
           <input
             id="password"
@@ -95,16 +97,16 @@ export default function LoginPage() {
             checked={remember}
             onChange={(e) => setRemember(e.target.checked)}
           />
-          Meni eslab qol
+          {t("auth.login.rememberMe")}
         </label>
 
         <button type="submit" className={styles.submitButton} disabled={loading}>
-          {loading ? "Kirilmoqda..." : "Kirish"}
+          {loading ? t("auth.login.submitting") : t("auth.login.submit")}
         </button>
       </form>
 
       <p className={styles.switchLine}>
-        Hisobingiz yo&apos;qmi? <Link href="/signup">Ro&apos;yxatdan o&apos;ting</Link>
+        {t("auth.login.noAccount")} <Link href="/signup">{t("auth.login.signupLink")}</Link>
       </p>
     </div>
   );

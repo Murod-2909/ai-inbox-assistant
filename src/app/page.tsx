@@ -21,158 +21,131 @@ import {
   WhatsAppIcon,
   InstagramIcon,
 } from "@/components/icons/BrandIcons";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import styles from "./landing.module.scss";
 
-const FEATURES = [
-  {
-    icon: "📥",
-    title: "Yagona inbox",
-    text: "Telegram (keyin WhatsApp, Instagram) xabarlari bitta oynada — hech narsa e'tibordan chetda qolmaydi.",
-  },
-  {
-    icon: "🧠",
-    title: "AI tahlil",
-    text: "Har bir xabarning kayfiyati va maqsadi (savol, buyurtma, shikoyat) avtomatik aniqlanadi.",
-  },
-  {
-    icon: "✨",
-    title: "Javob taklifi",
-    text: "AI mijozga mos javob taklif qiladi — operator bir bosishda tasdiqlab yuboradi.",
-  },
-  {
-    icon: "🎤",
-    title: "Media va ovoz",
-    text: "Rasm, video, stiker va ovozli xabarlar dashboard'da ochiladi; ovoz matnga aylanadi.",
-  },
-  {
-    icon: "📊",
-    title: "Jonli statistika",
-    text: "Javob tezligi, kayfiyat va murojaat turlari bo'yicha real vaqtdagi hisobotlar.",
-  },
-  {
-    icon: "⚡",
-    title: "Tezkor shablonlar",
-    text: "Ko'p so'raladigan savollarga tayyor javoblar — jamoa bir xilda va tez javob beradi.",
-  },
-];
-
-const STEPS = [
-  {
-    number: "1",
-    title: "Botni ulang",
-    text: "@BotFather'dan olingan tokenni kiriting — 1 daqiqada tayyor.",
-  },
-  {
-    number: "2",
-    title: "Xabarlar oqib keladi",
-    text: "Mijozlaringiz yozgan har bir xabar darhol inbox'ingizga tushadi.",
-  },
-  {
-    number: "3",
-    title: "AI bilan javob bering",
-    text: "Tahlil va tayyor javob taklifini ko'rib, bir bosishda yuboring.",
-  },
-];
-
-const INDUSTRIES = [
-  {
-    icon: "🛍",
-    title: "Do'konlar",
-    subtitle: "Mahsulot va buyurtma savollari",
-    detail:
-      "Narx, mavjudlik va yetkazib berish holati haqidagi savollarga AI darhol javob taklif qiladi — siz faqat tasdiqlaysiz.",
-  },
-  {
-    icon: "🏥",
-    title: "Klinikalar",
-    subtitle: "Navbat va konsultatsiya so'rovlari",
-    detail:
-      "Bemorlarning yozilish va ish vaqti haqidagi murojaatlari avtomatik tartiblanadi, shoshilinch xabarlar ajratib ko'rsatiladi.",
-  },
-  {
-    icon: "💇",
-    title: "Salonlar",
-    subtitle: "Yozilish va bandlik savollari",
-    detail:
-      "Mijozlar bo'sh vaqtlarni so'raganda, tayyor javob shablonlari bilan bir necha soniyada javob bering.",
-  },
-  {
-    icon: "📚",
-    title: "O'quv markazlari",
-    subtitle: "Kurs va ro'yxatga olish savollari",
-    detail:
-      "Kurs narxi, jadvali va ro'yxatdan o'tish bo'yicha takroriy savollarni AI hal qiladi, murakkab holatlar operatorga qoladi.",
-  },
-];
-
-const CHANNELS = [
-  { icon: <TelegramIcon />, label: "Telegram", status: "Faol", active: true, angle: 0 },
-  { icon: <WhatsAppIcon />, label: "WhatsApp", status: "Tez orada", angle: 120 },
-  { icon: <InstagramIcon />, label: "Instagram", status: "Tez orada", angle: 240 },
-];
-
-const PLANS = [
-  {
-    name: "Bepul",
-    slug: "free",
-    price: "0",
-    unit: "so'm/oy",
-    features: ["1 operator", "Telegram kanali", "Oyiga 100 AI tahlil", "Asosiy statistika"],
-    cta: "Bepul boshlash",
-    highlighted: false,
-  },
-  {
-    name: "Start",
-    slug: "start",
-    price: "149 000",
-    unit: "so'm/oy",
-    features: [
-      "3 operator",
-      "Media va ovozli xabarlar",
-      "Cheksiz AI tahlil",
-      "Javob shablonlari",
-      "To'liq statistika",
-    ],
-    cta: "Boshlash",
-    highlighted: true,
-  },
-  {
-    name: "Biznes",
-    slug: "business",
-    price: "349 000",
-    unit: "so'm/oy",
-    features: [
-      "Cheksiz operator",
-      "WhatsApp + Instagram (tez orada)",
-      "CRM va eksport",
-      "Avto-javoblar",
-      "Ustuvor qo'llab-quvvatlash",
-    ],
-    cta: "Bog'lanish",
-    highlighted: false,
-  },
-];
-
-const FAQ = [
-  {
-    q: "Ulanish uchun texnik bilim kerakmi?",
-    a: "Yo'q. Telegram'da @BotFather orqali bot yaratib, tokenni tizimga kiritasiz — qolganini biz qilamiz. Butun jarayon 5 daqiqadan oshmaydi.",
-  },
-  {
-    q: "AI mijozga o'zi javob yuboradimi?",
-    a: "Yo'q — AI faqat taklif qiladi. Har bir javob operator tasdiqlagandan keyingina yuboriladi. Ish vaqtidan tashqarida esa ixtiyoriy avto-javobni yoqishingiz mumkin.",
-  },
-  {
-    q: "Qaysi kanallar qo'llab-quvvatlanadi?",
-    a: "Hozir Telegram to'liq ishlaydi. WhatsApp va Instagram Direct integratsiyalari ustida ishlayapmiz — tez orada qo'shiladi.",
-  },
-  {
-    q: "Ma'lumotlarim xavfsizmi?",
-    a: "Har bir biznes faqat o'z ma'lumotlarini ko'radi (satr darajasidagi himoya — RLS), API kalitlar serverda saqlanadi va mijoz ma'lumotlari uchinchi tomonga berilmaydi.",
-  },
-];
-
 export default function LandingPage() {
+  const { t } = useLanguage();
+
+  const FEATURES = [
+    { icon: "📥", title: t("landing.features.inbox.title"), text: t("landing.features.inbox.text") },
+    { icon: "🧠", title: t("landing.features.ai.title"), text: t("landing.features.ai.text") },
+    { icon: "✨", title: t("landing.features.suggestion.title"), text: t("landing.features.suggestion.text") },
+    { icon: "🎤", title: t("landing.features.media.title"), text: t("landing.features.media.text") },
+    { icon: "📊", title: t("landing.features.stats.title"), text: t("landing.features.stats.text") },
+    { icon: "⚡", title: t("landing.features.templates.title"), text: t("landing.features.templates.text") },
+  ];
+
+  const STEPS = [
+    { number: "1", title: t("landing.how.step1.title"), text: t("landing.how.step1.text") },
+    { number: "2", title: t("landing.how.step2.title"), text: t("landing.how.step2.text") },
+    { number: "3", title: t("landing.how.step3.title"), text: t("landing.how.step3.text") },
+  ];
+
+  const INDUSTRIES = [
+    {
+      icon: "🛍",
+      title: t("landing.industry.shops.title"),
+      subtitle: t("landing.industry.shops.subtitle"),
+      detail: t("landing.industry.shops.detail"),
+    },
+    {
+      icon: "🏥",
+      title: t("landing.industry.clinics.title"),
+      subtitle: t("landing.industry.clinics.subtitle"),
+      detail: t("landing.industry.clinics.detail"),
+    },
+    {
+      icon: "💇",
+      title: t("landing.industry.salons.title"),
+      subtitle: t("landing.industry.salons.subtitle"),
+      detail: t("landing.industry.salons.detail"),
+    },
+    {
+      icon: "📚",
+      title: t("landing.industry.education.title"),
+      subtitle: t("landing.industry.education.subtitle"),
+      detail: t("landing.industry.education.detail"),
+    },
+  ];
+
+  const CHANNELS = [
+    {
+      icon: <TelegramIcon />,
+      label: t("landing.channels.telegram"),
+      status: t("landing.channels.active"),
+      active: true,
+      angle: 0,
+    },
+    {
+      icon: <WhatsAppIcon />,
+      label: t("landing.channels.whatsapp"),
+      status: t("landing.channels.soon"),
+      angle: 120,
+    },
+    {
+      icon: <InstagramIcon />,
+      label: t("landing.channels.instagram"),
+      status: t("landing.channels.soon"),
+      angle: 240,
+    },
+  ];
+
+  const PLANS = [
+    {
+      name: t("pricing.free.name"),
+      slug: "free",
+      price: "0",
+      unit: t("pricing.unit"),
+      features: [
+        t("pricing.free.feature.1"),
+        t("pricing.free.feature.2"),
+        t("pricing.free.feature.3"),
+        t("pricing.free.feature.4"),
+      ],
+      cta: t("pricing.free.cta"),
+      highlighted: false,
+    },
+    {
+      name: t("pricing.start.name"),
+      slug: "start",
+      price: "149 000",
+      unit: t("pricing.unit"),
+      features: [
+        t("pricing.start.feature.1"),
+        t("pricing.start.feature.2"),
+        t("pricing.start.feature.3"),
+        t("pricing.start.feature.4"),
+        t("pricing.start.feature.5"),
+      ],
+      cta: t("pricing.start.cta"),
+      highlighted: true,
+    },
+    {
+      name: t("pricing.business.name"),
+      slug: "business",
+      price: "349 000",
+      unit: t("pricing.unit"),
+      features: [
+        t("pricing.business.feature.1"),
+        t("pricing.business.feature.2"),
+        t("pricing.business.feature.3"),
+        t("pricing.business.feature.4"),
+        t("pricing.business.feature.5"),
+      ],
+      cta: t("pricing.business.cta"),
+      highlighted: false,
+    },
+  ];
+
+  const FAQ = [
+    { q: t("landing.faq.q1"), a: t("landing.faq.a1") },
+    { q: t("landing.faq.q2"), a: t("landing.faq.a2") },
+    { q: t("landing.faq.q3"), a: t("landing.faq.a3") },
+    { q: t("landing.faq.q4"), a: t("landing.faq.a4") },
+  ];
+
   return (
     <div className={styles.landing}>
       {/* --- Navigatsiya --- */}
@@ -181,18 +154,19 @@ export default function LandingPage() {
           <span className={styles.logoMark}>AI</span> Inbox Assistant
         </div>
         <div className={styles.navLinks}>
-          <a href="#features">Xususiyatlar</a>
-          <a href="#how">Qanday ishlaydi</a>
-          <a href="#pricing">Narxlar</a>
-          <a href="#faq">FAQ</a>
+          <a href="#features">{t("landing.nav.features")}</a>
+          <a href="#how">{t("landing.nav.how")}</a>
+          <a href="#pricing">{t("landing.nav.pricing")}</a>
+          <a href="#faq">{t("landing.nav.faq")}</a>
         </div>
         <div className={styles.navActions}>
+          <LanguageSwitcher dropDirection="down" />
           <Link href="/login" className={styles.ghostButton}>
-            Kirish
+            {t("landing.nav.login")}
           </Link>
           <Magnetic strength={0.4}>
             <Link href="/signup" className={styles.primaryButton}>
-              Bepul boshlash
+              {t("landing.nav.signup")}
             </Link>
           </Magnetic>
         </div>
@@ -208,30 +182,24 @@ export default function LandingPage() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <h1>
-            Barcha mijoz xabarlari.
+            {t("landing.hero.title1")}
             <br />
-            <span className={styles.accent}>Bitta joyda. AI bilan.</span>
+            <span className={styles.accent}>{t("landing.hero.title2")}</span>
           </h1>
-          <p>
-            Do&apos;kon, klinika, salon yoki o&apos;quv markazi uchun: Telegram
-            xabarlarini yagona inbox&apos;ga yig&apos;ing, AI tahlili va tayyor
-            javob takliflari bilan mijozlarga 3 barobar tez javob bering.
-          </p>
+          <p>{t("landing.hero.subtitle")}</p>
           <div className={styles.heroCtas}>
             <Magnetic strength={0.35}>
               <Link href="/signup" className={styles.primaryButtonLarge}>
-                Bepul boshlash
+                {t("landing.hero.ctaPrimary")}
               </Link>
             </Magnetic>
             <Magnetic strength={0.35}>
               <Link href="/inbox" className={styles.ghostButtonLarge}>
-                Jonli demo ko&apos;rish
+                {t("landing.hero.ctaSecondary")}
               </Link>
             </Magnetic>
           </div>
-          <span className={styles.heroNote}>
-            Karta talab qilinmaydi · 5 daqiqada ulanish
-          </span>
+          <span className={styles.heroNote}>{t("landing.hero.note")}</span>
         </motion.div>
 
         {/* Mini dashboard ko'rinishi — 3D tilt bilan */}
@@ -245,36 +213,33 @@ export default function LandingPage() {
               <div className={styles.previewRow}>
                 <span className={`${styles.previewDot} ${styles.dotGreen}`} />
                 <div>
-                  <strong>Dilnoza K.</strong>
-                  <small>Ertaga 15:00 ga yozilsam...</small>
+                  <strong>{t("landing.preview.customer1Name")}</strong>
+                  <small>{t("landing.preview.customer1Msg")}</small>
                 </div>
               </div>
               <div className={`${styles.previewRow} ${styles.previewRowActive}`}>
                 <span className={`${styles.previewDot} ${styles.dotRed}`} />
                 <div>
-                  <strong>Jasur T.</strong>
-                  <small>Buyurtmam kelmayapti!</small>
+                  <strong>{t("landing.preview.customer2Name")}</strong>
+                  <small>{t("landing.preview.customer2Msg")}</small>
                 </div>
               </div>
               <div className={styles.previewRow}>
                 <span className={`${styles.previewDot} ${styles.dotAmber}`} />
                 <div>
-                  <strong>Madina R.</strong>
-                  <small>Narxi qancha?</small>
+                  <strong>{t("landing.preview.customer3Name")}</strong>
+                  <small>{t("landing.preview.customer3Msg")}</small>
                 </div>
               </div>
             </div>
             <div className={styles.previewPanel}>
               <div className={styles.previewBadges}>
-                <span>😠 Salbiy</span>
-                <span>⚠️ Shikoyat</span>
+                <span>{t("landing.preview.sentimentNegative")}</span>
+                <span>{t("landing.preview.complaint")}</span>
               </div>
-              <div className={styles.previewBubble}>
-                Buyurtmam 3 kundan beri kelmayapti!
-              </div>
+              <div className={styles.previewBubble}>{t("landing.preview.bubble")}</div>
               <div className={styles.previewSuggestion}>
-                ✨ AI taklifi: &quot;Uzr so&apos;raymiz! Buyurtma raqamingizni
-                yuboring, hoziroq tekshiramiz.&quot;
+                {t("landing.preview.suggestion")}
               </div>
             </div>
           </TiltCard>
@@ -284,7 +249,7 @@ export default function LandingPage() {
       {/* --- Kimlar uchun (soha ko'rgazmasi) --- */}
       <section className={styles.audience}>
         <ScrollReveal>
-          <h2>Sohangizga moslashtirilgan</h2>
+          <h2>{t("landing.audience.title")}</h2>
         </ScrollReveal>
         <ScrollReveal delay={0.05}>
           <IndustryShowcase items={INDUSTRIES} />
@@ -294,7 +259,7 @@ export default function LandingPage() {
       {/* --- Kanallar (orbit diagramma) --- */}
       <section className={styles.channels}>
         <ScrollReveal>
-          <h2>Mijozlaringiz qayerda bo&apos;lsa — siz ham o&apos;sha yerdasiz</h2>
+          <h2>{t("landing.channels.title")}</h2>
         </ScrollReveal>
         <ScrollReveal delay={0.08}>
           <OrbitDiagram centerIcon="💬" items={CHANNELS} />
@@ -304,7 +269,7 @@ export default function LandingPage() {
       {/* --- Xususiyatlar --- */}
       <section id="features" className={styles.features}>
         <ScrollReveal>
-          <h2>Kichik jamoa uchun katta imkoniyatlar</h2>
+          <h2>{t("landing.features.title")}</h2>
         </ScrollReveal>
         <div className={styles.featureGrid}>
           {FEATURES.map((feature, i) => (
@@ -322,7 +287,7 @@ export default function LandingPage() {
       {/* --- Qanday ishlaydi --- */}
       <section id="how" className={styles.how}>
         <ScrollReveal>
-          <h2>3 qadamda ishga tushiring</h2>
+          <h2>{t("landing.how.title")}</h2>
         </ScrollReveal>
         <div className={styles.steps}>
           {STEPS.map((step, i) => (
@@ -348,12 +313,10 @@ export default function LandingPage() {
       {/* --- Narxlar --- */}
       <section id="pricing" className={styles.pricing}>
         <ScrollReveal>
-          <h2>Oddiy va oshkora narxlar</h2>
+          <h2>{t("landing.pricing.title")}</h2>
         </ScrollReveal>
         <ScrollReveal delay={0.05}>
-          <p className={styles.pricingNote}>
-            Narxlar dastlabki — rasmiy ishga tushishda aniqlashtiriladi
-          </p>
+          <p className={styles.pricingNote}>{t("landing.pricing.note")}</p>
         </ScrollReveal>
         <div className={styles.planGrid}>
           {PLANS.map((plan, i) => (
@@ -363,7 +326,7 @@ export default function LandingPage() {
                 maxTilt={6}
               >
                 {plan.highlighted && (
-                  <span className={styles.planBadge}>Eng ommabop</span>
+                  <span className={styles.planBadge}>{t("pricing.badge")}</span>
                 )}
                 <h3>{plan.name}</h3>
                 <div className={styles.planPrice}>
@@ -395,7 +358,7 @@ export default function LandingPage() {
       {/* --- FAQ --- */}
       <section id="faq" className={styles.faq}>
         <ScrollReveal>
-          <h2>Ko&apos;p so&apos;raladigan savollar</h2>
+          <h2>{t("landing.faq.title")}</h2>
         </ScrollReveal>
         <div className={styles.faqList}>
           {FAQ.map((item, i) => (
@@ -412,11 +375,11 @@ export default function LandingPage() {
       {/* --- Yakuniy CTA --- */}
       <section className={styles.finalCta}>
         <ScrollReveal>
-          <h2>Mijozlaringizni kuttirmang</h2>
-          <p>Bugun ulaning — birinchi xabarlar 5 daqiqada inbox&apos;ingizda.</p>
+          <h2>{t("landing.finalCta.title")}</h2>
+          <p>{t("landing.finalCta.text")}</p>
           <Magnetic strength={0.35}>
             <Link href="/signup" className={styles.primaryButtonLarge}>
-              Bepul boshlash
+              {t("landing.hero.ctaPrimary")}
             </Link>
           </Magnetic>
         </ScrollReveal>
@@ -429,24 +392,23 @@ export default function LandingPage() {
             <div className={styles.logo}>
               <span className={styles.logoMark}>AI</span> Inbox Assistant
             </div>
-            <p>Kichik bizneslar uchun AI yordamchili mijozlar inbox&apos;i.</p>
+            <p>{t("landing.footer.tagline")}</p>
           </div>
           <div className={styles.footerColumn}>
-            <strong>Mahsulot</strong>
-            <a href="#features">Xususiyatlar</a>
-            <a href="#pricing">Narxlar</a>
-            <Link href="/inbox">Jonli demo</Link>
+            <strong>{t("landing.footer.product")}</strong>
+            <a href="#features">{t("landing.nav.features")}</a>
+            <a href="#pricing">{t("landing.nav.pricing")}</a>
+            <Link href="/inbox">{t("landing.footer.liveDemo")}</Link>
           </div>
           <div className={styles.footerColumn}>
-            <strong>Hisob</strong>
-            <Link href="/signup">Ro&apos;yxatdan o&apos;tish</Link>
-            <Link href="/login">Kirish</Link>
-            <Link href="/reset">Parolni tiklash</Link>
+            <strong>{t("landing.footer.account")}</strong>
+            <Link href="/signup">{t("landing.footer.signup")}</Link>
+            <Link href="/login">{t("landing.nav.login")}</Link>
+            <Link href="/reset">{t("landing.footer.resetPassword")}</Link>
           </div>
         </div>
         <div className={styles.footerBottom}>
-          © {new Date().getFullYear()} AI Inbox Assistant — barcha huquqlar
-          himoyalangan
+          © {new Date().getFullYear()} AI Inbox Assistant — {t("landing.footer.rights")}
         </div>
       </footer>
     </div>

@@ -3,10 +3,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/useAuth";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 
 export function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -27,7 +29,7 @@ export function ProtectedLayout({ children }: { children: React.ReactNode }) {
           color: "var(--color-text-muted)",
         }}
       >
-        Yuklanmoqda...
+        {t("common.loading")}
       </div>
     );
   }

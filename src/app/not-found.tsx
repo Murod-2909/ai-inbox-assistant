@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "./not-found.module.scss";
 
 // Global 404 — Next.js App Router har qanday mos kelmagan marshrut uchun
 // avtomatik shu faylni ko'rsatadi. Login holatini bilmaymiz (bu sahifa
 // himoyalanmagan qatlamda), shuning uchun faqat umumiy havolalar beriladi.
 export default function NotFound() {
+  const { t } = useLanguage();
+
   return (
     <div className={styles.wrapper}>
       <motion.div
@@ -26,18 +29,15 @@ export default function NotFound() {
         </motion.div>
 
         <h1>404</h1>
-        <h2>Sahifa topilmadi</h2>
-        <p>
-          Qidirilayotgan sahifa mavjud emas yoki ko&apos;chirilgan bo&apos;lishi
-          mumkin.
-        </p>
+        <h2>{t("misc.notFound.title")}</h2>
+        <p>{t("misc.notFound.text")}</p>
 
         <div className={styles.actions}>
           <Link href="/" className={styles.primaryButton}>
-            Bosh sahifaga qaytish
+            {t("misc.notFound.home")}
           </Link>
           <Link href="/inbox" className={styles.ghostButton}>
-            Inbox&apos;ga o&apos;tish
+            {t("misc.notFound.inbox")}
           </Link>
         </div>
       </motion.div>

@@ -6,9 +6,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import styles from "../auth.module.scss";
 
 export default function ResetPage() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -16,7 +18,7 @@ export default function ResetPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!/^\S+@\S+\.\S+$/.test(email)) {
-      setError("Email manzilini to'g'ri kiriting");
+      setError(t("auth.reset.errInvalid"));
       return;
     }
     setError("");
@@ -35,14 +37,10 @@ export default function ResetPage() {
     return (
       <div className={styles.successState}>
         <span className={styles.successIcon}>🔑</span>
-        <h2>Havola yuborildi</h2>
-        <p>
-          Agar <strong>{email}</strong> ro&apos;yxatdan o&apos;tgan bo&apos;lsa,
-          parolni tiklash havolasi yuborildi. Pochtangizni (spam papkasini ham)
-          tekshiring.
-        </p>
+        <h2>{t("auth.reset.sent.title")}</h2>
+        <p>{t("auth.reset.sent.text", { email })}</p>
         <Link href="/login" className={styles.submitButton}>
-          Kirish sahifasiga qaytish
+          {t("auth.reset.backToLogin")}
         </Link>
       </div>
     );
@@ -50,31 +48,29 @@ export default function ResetPage() {
 
   return (
     <div>
-      <h1 className={styles.title}>Parolni tiklash</h1>
-      <p className={styles.subtitle}>
-        Email manzilingizni kiriting — tiklash havolasini yuboramiz
-      </p>
+      <h1 className={styles.title}>{t("auth.reset.title")}</h1>
+      <p className={styles.subtitle}>{t("auth.reset.subtitle")}</p>
 
       {error && <div className={styles.errorBanner}>{error}</div>}
 
       <form onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">{t("auth.emailLabel")}</label>
           <input
             id="email"
             type="email"
-            placeholder="siz@biznes.uz"
+            placeholder={t("auth.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <button type="submit" className={styles.submitButton}>
-          Havola yuborish
+          {t("auth.reset.submit")}
         </button>
       </form>
 
       <p className={styles.switchLine}>
-        Esladingizmi? <Link href="/login">Kirish</Link>
+        {t("auth.reset.rememberedIt")} <Link href="/login">{t("auth.login.submit")}</Link>
       </p>
     </div>
   );
