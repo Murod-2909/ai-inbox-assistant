@@ -1,0 +1,49 @@
+@use "variables" as *;
+
+// "Liquid" tugma effekti: hech qanday siljish/masshtab (translateY, scale)
+// yo'q — faqat markazdan yoyiluvchi rangli suyuqlik to'lqini (::before,
+// radial) + yumshoq soya. $fill — to'lqin rangi: filled (primary) tugmalar
+// uchun oq shaffof, ghost/neytral tugmalar uchun $color-primary-soft kabi
+// och rang beriladi.
+@mixin liquid-button($fill: rgba(255, 255, 255, 0.22)) {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: box-shadow 0.4s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: #{$fill};
+    transform: translate(-50%, -50%);
+    transition:
+      width 0.7s cubic-bezier(0.19, 1, 0.22, 1),
+      height 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  &:hover:not(:disabled) {
+    box-shadow: $shadow-md;
+
+    &::before {
+      width: 280%;
+      height: 280%;
+    }
+  }
+
+  &:active:not(:disabled)::before {
+    width: 320%;
+    height: 320%;
+    transition-duration: 0.25s;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}

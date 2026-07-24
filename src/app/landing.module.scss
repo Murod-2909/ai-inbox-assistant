@@ -1,4 +1,5 @@
 @use "@/styles/variables" as *;
+@use "@/styles/buttons" as *;
 
 .landing {
   min-height: 100vh;
@@ -20,17 +21,13 @@
 
 .primaryButton,
 .primaryButtonLarge {
+  @include liquid-button;
   display: inline-block;
   background: $color-primary;
   color: #fff;
   font-weight: 600;
   border-radius: $radius-md;
   text-align: center;
-  transition: opacity 0.15s;
-
-  &:hover {
-    opacity: 0.9;
-  }
 }
 
 .primaryButton {
@@ -45,17 +42,13 @@
 
 .ghostButton,
 .ghostButtonLarge {
+  @include liquid-button($color-primary-soft);
   display: inline-block;
   color: $color-text;
   font-weight: 600;
   border: 1px solid $color-border;
   border-radius: $radius-md;
   text-align: center;
-  transition: background 0.15s;
-
-  &:hover {
-    background: $color-primary-soft;
-  }
 }
 
 .ghostButton {

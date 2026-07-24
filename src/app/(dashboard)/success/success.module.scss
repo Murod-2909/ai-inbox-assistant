@@ -1,4 +1,5 @@
 @use "@/styles/variables" as *;
+@use "@/styles/buttons" as *;
 
 .successPage {
   flex: 1;
@@ -102,28 +103,20 @@
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.2s;
     display: inline-block;
     text-align: center;
   }
 
   .primaryButton {
+    @include liquid-button;
     background: $color-primary;
     color: #fff;
-
-    &:hover {
-      background: var(--color-primary-hover, lighten($color-primary, 5%));
-      transform: translateY(-2px);
-    }
   }
 
   .secondaryButton {
+    @include liquid-button($color-primary-soft);
     background: $color-border;
     color: $color-text;
-
-    &:hover {
-      background: $color-bg;
-    }
   }
 }
 

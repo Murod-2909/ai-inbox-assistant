@@ -1,4 +1,5 @@
 @use "@/styles/variables" as *;
+@use "@/styles/buttons" as *;
 
 .card {
   background: $color-surface;
@@ -150,6 +151,7 @@
   gap: 12px;
 
   button {
+    @include liquid-button;
     background: $color-primary;
     color: #fff;
     font-size: 13px;
@@ -159,7 +161,6 @@
 
     &:disabled {
       opacity: 0.6;
-      cursor: not-allowed;
     }
   }
 }

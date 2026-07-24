@@ -1,4 +1,5 @@
 @use "@/styles/variables" as *;
+@use "@/styles/buttons" as *;
 
 .wrapper {
   display: grid;
@@ -84,23 +85,16 @@
   font-weight: 600;
   border-radius: $radius-md;
   padding: 10px 20px;
-  transition: opacity 0.15s, background 0.15s;
 }
 
 .primaryButton {
+  @include liquid-button;
   background: $color-primary;
   color: #fff;
-
-  &:hover {
-    opacity: 0.9;
-  }
 }
 
 .ghostButton {
+  @include liquid-button($color-primary-soft);
   color: $color-text;
   border: 1px solid $color-border;
-
-  &:hover {
-    background: $color-surface;
-  }
 }
